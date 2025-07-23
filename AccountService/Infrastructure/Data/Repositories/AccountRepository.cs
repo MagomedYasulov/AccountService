@@ -1,4 +1,4 @@
-﻿using AccountService.Application.Interfaces;
+﻿using AccountService.Domain.Repositories;
 
 namespace AccountService.Infrastructure.Data.Repositories
 {

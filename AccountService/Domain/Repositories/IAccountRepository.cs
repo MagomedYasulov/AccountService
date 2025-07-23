@@ -1,4 +1,4 @@
-﻿namespace AccountService.Application.Interfaces
+﻿namespace AccountService.Domain.Repositories
 {
     public interface IAccountRepository
     {

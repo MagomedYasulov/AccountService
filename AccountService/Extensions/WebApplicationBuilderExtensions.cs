@@ -1,10 +1,10 @@
-﻿using AccountService.Application.Interfaces;
-using AccountService.Infrastructure.Data.Repositories;
+﻿using AccountService.Infrastructure.Data.Repositories;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using AccountService.Middlewares;
+using AccountService.Domain.Repositories;
 
 namespace AccountService.Extensions
 {
