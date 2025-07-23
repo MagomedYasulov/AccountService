@@ -12,6 +12,7 @@ namespace AccountService
             // Add services to the container.
             builder.AddData();
             builder.AddControllers();
+            builder.AddMediatR();
             builder.AddFluentValidation();
             builder.AddAutoMapper();
             builder.AddExceptionHandler();

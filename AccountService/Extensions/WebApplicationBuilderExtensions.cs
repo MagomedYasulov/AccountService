@@ -1,10 +1,12 @@
 ﻿using AccountService.Infrastructure.Data.Repositories;
-using FluentValidation.AspNetCore;
 using FluentValidation;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using AccountService.Middlewares;
 using AccountService.Domain.Repositories;
+using MediatR;
+using AccountService.Application.PipelineBehaviors;
+using AccountService.Features.Accounts.Models;
 
 namespace AccountService.Extensions
 {
@@ -29,13 +31,16 @@ namespace AccountService.Extensions
             return builder;
         }
 
+        public static WebApplicationBuilder AddMediatR(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviors<,>));
+            return builder;
+        }
+
         public static WebApplicationBuilder AddFluentValidation(this WebApplicationBuilder builder)
         {
-            builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-            builder.Services.AddFluentValidationAutoValidation(config =>
-            {
-                config.DisableDataAnnotationsValidation = true;
-            });
+            builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
             return builder;
         }
 
@@ -44,8 +49,7 @@ namespace AccountService.Extensions
             builder.Services.AddAutoMapper(cfg =>
             {
                 //TODO: добавить маппер профиили
-                //cfg.AddProfile<OrderAutoMapperProfile>();
-                //cfg.AddProfile<ClientAutoMapperProfile>();
+                cfg.AddProfile<AccountAutoMapperProfile>();
             });
             return builder;
         }
