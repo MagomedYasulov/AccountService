@@ -81,6 +81,7 @@ namespace AccountService.Extensions
 
         public static WebApplicationBuilder AddAppServices(this WebApplicationBuilder builder)
         {
+            builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
             builder.Services.AddSingleton<IClientService, ClientService>();
             return builder;
         }

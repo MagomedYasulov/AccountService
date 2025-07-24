@@ -13,9 +13,9 @@ namespace AccountService.Infrastructure.Services
             new Guid("2d9962ea-f43f-4dbf-8ffc-4bae23866e87")
         ];
 
-        public bool VerifyClient(Guid clientId)
+        public Task<bool> VerifyClient(Guid clientId)
         {
-           return _clientsId.Contains(clientId);
+           return Task.FromResult(_clientsId.Contains(clientId));
         }
     }
 }

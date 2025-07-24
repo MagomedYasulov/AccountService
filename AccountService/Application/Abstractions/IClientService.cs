@@ -2,6 +2,6 @@
 {
     public interface IClientService
     {
-        public bool VerifyClient(Guid clientId);
+        public Task<bool> VerifyClient(Guid clientId);
     }
 }
