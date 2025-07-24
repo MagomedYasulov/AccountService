@@ -1,5 +1,6 @@
 ﻿using AccountService.Domain.Entities;
 using AccountService.Domain.Enums;
+using AccountService.Domain.Models;
 using AccountService.Domain.Repositories;
 
 namespace AccountService.Infrastructure.Data.Repositories
@@ -18,6 +19,12 @@ namespace AccountService.Infrastructure.Data.Repositories
                 Type = AccountType.Checking
             }
         ];
+
+        public Task<Account[]> GetAsync(AccountFilter filter)
+        {
+            var result = _accounts.Where(a => filter.OwnerId == null || a.OwnerId == filter.OwnerId).ToArray();
+            return Task.FromResult(result);
+        }
 
         public Task<Account?> GetByIdAsync(Guid id)
         {

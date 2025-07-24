@@ -1,8 +1,8 @@
 ﻿using AccountService.Features.Accounts.DTOs;
 using AccountService.Features.Accounts.GetAccount;
+using AccountService.Features.Accounts.GetAccounts;
 using AccountService.Filters;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccountService.Features.Accounts
@@ -23,6 +23,13 @@ namespace AccountService.Features.Accounts
         public async Task<ActionResult<AccountDto>> Get(Guid id)
         {
             var accountDto = await _mediator.Send(new GetAccountByIdQuery { Id = id });
+            return Ok(accountDto);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<AccountDto>> Get([FromQuery] Guid? ownerId)
+        {
+            var accountDto = await _mediator.Send(new GetAccountsQuery { OwnerId = ownerId });
             return Ok(accountDto);
         }
     }
