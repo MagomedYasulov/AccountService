@@ -1,6 +1,6 @@
 ﻿using AccountService.Domain.Enums;
 
-namespace AccountService.Domain.Entities
+namespace AccountService.Domain.Data.Entities
 {
     public class Account : BaseEntity
     {

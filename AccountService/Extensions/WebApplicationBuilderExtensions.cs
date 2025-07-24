@@ -3,10 +3,12 @@ using FluentValidation;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using AccountService.Middlewares;
-using AccountService.Domain.Repositories;
 using MediatR;
 using AccountService.Application.PipelineBehaviors;
 using AccountService.Features.Accounts.Models;
+using AccountService.Domain.Data.Repositories;
+using AccountService.Application.Abstractions;
+using AccountService.Infrastructure.Services;
 
 namespace AccountService.Extensions
 {
@@ -76,5 +78,12 @@ namespace AccountService.Extensions
 
             return builder;
         }
+
+        public static WebApplicationBuilder AddAppServices(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddSingleton<IClientService, ClientService>();
+            return builder;
+        }
+
     }
 }

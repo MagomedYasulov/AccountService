@@ -1,4 +1,4 @@
-﻿namespace AccountService.Domain.Entities
+﻿namespace AccountService.Domain.Data.Entities
 {
     public class BaseEntity
     {

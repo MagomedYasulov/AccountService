@@ -1,5 +1,5 @@
-﻿using AccountService.Domain.Models;
-using AccountService.Domain.Repositories;
+﻿using AccountService.Domain.Data.Repositories;
+using AccountService.Domain.Models;
 using AccountService.Features.Accounts.DTOs;
 using AutoMapper;
 using MediatR;

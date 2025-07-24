@@ -1,4 +1,4 @@
-﻿using AccountService.Domain.Repositories;
+﻿using AccountService.Domain.Data.Repositories;
 
 namespace AccountService.Infrastructure.Data.Repositories
 {

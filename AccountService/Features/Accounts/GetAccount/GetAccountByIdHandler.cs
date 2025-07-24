@@ -1,4 +1,4 @@
-﻿using AccountService.Domain.Repositories;
+﻿using AccountService.Domain.Data.Repositories;
 using AccountService.Exceptions;
 using AccountService.Features.Accounts.DTOs;
 using AutoMapper;

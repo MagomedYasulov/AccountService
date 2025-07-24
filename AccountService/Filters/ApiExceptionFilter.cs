@@ -41,7 +41,7 @@ namespace AccountService.Filters
             var response = new ProblemDetails()
             {
                 Title = "Validation Exception",
-                Detail = validationException.Message,
+                Detail = "One or more validation errors occurred",
                 Status = StatusCodes.Status400BadRequest,
                 Type = _options.Value.ClientErrorMapping[StatusCodes.Status400BadRequest].Link,
                 Instance = context.HttpContext.Request.Path,
@@ -58,7 +58,7 @@ namespace AccountService.Filters
                     })
                 .ToDictionary(x => x.Key, x => x.Values);
 
-            response.Extensions.Add("Errors", errorsDesc);
+            response.Extensions.Add("errors", errorsDesc);
 
             context.Result = new JsonResult(response) { StatusCode = StatusCodes.Status400BadRequest };
         }

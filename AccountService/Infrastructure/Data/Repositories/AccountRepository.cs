@@ -1,7 +1,7 @@
-﻿using AccountService.Domain.Entities;
+﻿using AccountService.Domain.Data.Entities;
+using AccountService.Domain.Data.Repositories;
 using AccountService.Domain.Enums;
 using AccountService.Domain.Models;
-using AccountService.Domain.Repositories;
 
 namespace AccountService.Infrastructure.Data.Repositories
 {
@@ -14,11 +14,18 @@ namespace AccountService.Infrastructure.Data.Repositories
                 Id = new Guid("438af497-aece-4b49-8448-e3f8d142aaa1"), 
                 Balance = 100, 
                 OpenedAt = DateTime.Now, 
-                OwnerId = Guid.NewGuid(), 
+                OwnerId = new Guid("7dc4a2af-305c-4ec3-810b-718157d010ae"), 
                 CurrencyCode = "RUB", 
-                Type = AccountType.Checking
+                Type = AccountType.Checking               
             }
         ];
+
+        public Task CreateAsync(Account account)
+        {
+            account.Id = Guid.NewGuid();
+            _accounts.Add(account);
+            return Task.CompletedTask;
+        }
 
         public Task<Account[]> GetAsync(AccountFilter filter)
         {

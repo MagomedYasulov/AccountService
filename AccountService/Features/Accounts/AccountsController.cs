@@ -1,4 +1,5 @@
-﻿using AccountService.Features.Accounts.DTOs;
+﻿using AccountService.Features.Accounts.CreateAccount;
+using AccountService.Features.Accounts.DTOs;
 using AccountService.Features.Accounts.GetAccount;
 using AccountService.Features.Accounts.GetAccounts;
 using AccountService.Filters;
@@ -17,6 +18,13 @@ namespace AccountService.Features.Accounts
         public AccountsController(IMediator mediator)
         {
             _mediator = mediator;   
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<AccountDto>> Get(CreateAccountCommand command)
+        {
+            var accountDto = await _mediator.Send(command);
+            return Ok(accountDto);
         }
 
         [HttpGet("{id:guid}")]

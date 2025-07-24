@@ -13,6 +13,7 @@ namespace AccountService
             builder.AddData();
             builder.AddControllers();
             builder.AddMediatR();
+            builder.AddAppServices();
             builder.AddFluentValidation();
             builder.AddAutoMapper();
             builder.AddExceptionHandler();
