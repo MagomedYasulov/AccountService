@@ -1,6 +1,6 @@
 ﻿using AccountService.Domain.Data.Repositories;
 using AccountService.Exceptions;
-using AccountService.Features.Accounts.DTOs;
+using AccountService.Features.Accounts.Models;
 using AutoMapper;
 using MediatR;
 

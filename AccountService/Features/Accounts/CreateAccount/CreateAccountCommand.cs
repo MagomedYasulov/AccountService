@@ -1,5 +1,5 @@
 ﻿using AccountService.Domain.Enums;
-using AccountService.Features.Accounts.DTOs;
+using AccountService.Features.Accounts.Models;
 using MediatR;
 
 namespace AccountService.Features.Accounts.CreateAccount

@@ -12,5 +12,10 @@ namespace AccountService.Domain.Data.Entities
         public DateTime OpenedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
         public List<Transaction> Transactions { get; set; } = [];
+
+        /// <summary>
+        /// Soft delete
+        /// </summary>
+        public bool Revoked { get; set; }
     }
 }

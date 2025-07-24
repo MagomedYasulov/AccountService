@@ -1,7 +1,8 @@
 ﻿using AccountService.Features.Accounts.CreateAccount;
-using AccountService.Features.Accounts.DTOs;
+using AccountService.Features.Accounts.DeleteAccount;
 using AccountService.Features.Accounts.GetAccount;
 using AccountService.Features.Accounts.GetAccounts;
+using AccountService.Features.Accounts.Models;
 using AccountService.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -20,13 +21,23 @@ namespace AccountService.Features.Accounts
             _mediator = mediator;   
         }
 
+        /// <summary>
+        /// Создание счета
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<AccountDto>> Get(CreateAccountCommand command)
+        public async Task<ActionResult<AccountDto>> Create(CreateAccountCommand command)
         {
             var accountDto = await _mediator.Send(command);
-            return Ok(accountDto);
+            return Created("", accountDto);
         }
 
+        /// <summary>
+        /// Получение счета
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<AccountDto>> Get(Guid id)
         {
@@ -34,11 +45,30 @@ namespace AccountService.Features.Accounts
             return Ok(accountDto);
         }
 
+        /// <summary>
+        /// Получение счетов
+        /// </summary>
+        /// <param name="ownerId">получить счета клиента</param>
+        /// <param name="revoked">получить все счета / анулированные / не анулированные</param>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<AccountDto>> Get([FromQuery] Guid? ownerId)
+        public async Task<ActionResult<AccountDto>> Get([FromQuery] Guid? ownerId, [FromQuery] bool? revoked)
         {
-            var accountDto = await _mediator.Send(new GetAccountsQuery { OwnerId = ownerId });
+            var accountDto = await _mediator.Send(new GetAccountsQuery { OwnerId = ownerId, Revoked = revoked });
             return Ok(accountDto);
+        }
+
+        /// <summary>
+        /// Удаление счета
+        /// </summary>
+        /// <param name="id">id удаляемого счета</param>
+        /// <param name="isSoft">Полное / мягкое удаление</param>
+        /// <returns></returns>
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult<AccountDto>> Delete(Guid id, [FromQuery] bool isSoft)
+        {
+            await _mediator.Send(new DeleteAccountCommand { Id = id, IsSoft = isSoft });
+            return Ok();
         }
     }
 }

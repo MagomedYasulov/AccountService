@@ -1,6 +1,6 @@
 ﻿using AccountService.Domain.Enums;
 
-namespace AccountService.Features.Accounts.DTOs
+namespace AccountService.Features.Accounts.Models
 {
     public class AccountDto
     {
@@ -12,5 +12,6 @@ namespace AccountService.Features.Accounts.DTOs
         public decimal? InterestRate { get; set; }
         public DateTime OpenedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
+        public bool Revoked { get; set; }
     }
 }

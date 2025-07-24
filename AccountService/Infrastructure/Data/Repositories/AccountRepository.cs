@@ -29,13 +29,31 @@ namespace AccountService.Infrastructure.Data.Repositories
 
         public Task<Account[]> GetAsync(AccountFilter filter)
         {
-            var result = _accounts.Where(a => filter.OwnerId == null || a.OwnerId == filter.OwnerId).ToArray();
+            var isOwnerIdNull = filter.OwnerId == null;
+            var isRevokedNull = filter.Revoked == null;
+
+            Func<Account, bool> predicate = (account) => (isOwnerIdNull || account.OwnerId == filter.OwnerId) &&
+                                                         (isRevokedNull || account.Revoked == filter.Revoked);
+            var result = _accounts.Where(predicate).ToArray();
             return Task.FromResult(result);
         }
 
         public Task<Account?> GetByIdAsync(Guid id)
         {
             return Task.FromResult(_accounts.FirstOrDefault(a => a.Id == id));
+        }
+
+        public Task UpdateAsync(Account account)
+        {
+            _accounts.RemoveAll(a => a.Id == account.Id);
+            _accounts.Add(account);
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteAsync(Account account)
+        {
+            _accounts.RemoveAll(a => a.Id == account.Id);
+            return Task.CompletedTask;
         }
     }
 }

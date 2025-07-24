@@ -4,9 +4,9 @@ using FluentValidation;
 
 namespace AccountService.Features.Accounts.CreateAccount
 {
-    public class CreateAccountValidtor : AbstractValidator<CreateAccountCommand>
+    public class CreateAccountValidator : AbstractValidator<CreateAccountCommand>
     {
-        public CreateAccountValidtor()
+        public CreateAccountValidator()
         {
             RuleFor(c => c.OwnerId).NotEmpty();
             RuleFor(c => c.Type).NotNull().IsInEnum();
