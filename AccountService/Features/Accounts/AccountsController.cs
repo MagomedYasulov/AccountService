@@ -3,6 +3,7 @@ using AccountService.Features.Accounts.DeleteAccount;
 using AccountService.Features.Accounts.GetAccount;
 using AccountService.Features.Accounts.GetAccounts;
 using AccountService.Features.Accounts.Models;
+using AccountService.Features.Accounts.UpdateAccount;
 using AccountService.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -55,6 +56,19 @@ namespace AccountService.Features.Accounts
         public async Task<ActionResult<AccountDto>> Get([FromQuery] Guid? ownerId, [FromQuery] bool? revoked)
         {
             var accountDto = await _mediator.Send(new GetAccountsQuery { OwnerId = ownerId, Revoked = revoked });
+            return Ok(accountDto);
+        }
+
+        /// <summary>
+        /// Изменение счета
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        [HttpPut("{id:guid}/interestrate")]
+        public async Task<ActionResult<AccountDto>> Update(Guid id, UpdateAccountDto command)
+        {
+            var accountDto = await _mediator.Send(new UpdateAccountCommand() { Id = id, InterestRate = command.InterestRate});
             return Ok(accountDto);
         }
 

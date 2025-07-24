@@ -22,6 +22,7 @@ namespace AccountService.Features.Accounts.DeleteAccount
             if (request.IsSoft)
             {
                 account.Revoked = true;
+                account.ClosedAt = DateTime.UtcNow;
                 await _accountRepository.UpdateAsync(account);
             }
             else
