@@ -2,6 +2,7 @@
 using AccountService.Features.Accounts.DeleteAccount;
 using AccountService.Features.Accounts.GetAccount;
 using AccountService.Features.Accounts.GetAccounts;
+using AccountService.Features.Accounts.GetAccountStatement;
 using AccountService.Features.Accounts.Models;
 using AccountService.Features.Accounts.UpdateAccount;
 using AccountService.Filters;
@@ -44,6 +45,18 @@ namespace AccountService.Features.Accounts
         {
             var accountDto = await _mediator.Send(new GetAccountByIdQuery { Id = id });
             return Ok(accountDto);
+        }
+
+        /// <summary>
+        /// Получение выписки по счету
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id:guid}/statement")]
+        public async Task<ActionResult<AccountDto>> GetStatement(Guid id)
+        {
+            var statementDto = await _mediator.Send(new GetAccountStatementQuery { Id = id });
+            return Ok(statementDto);
         }
 
         /// <summary>

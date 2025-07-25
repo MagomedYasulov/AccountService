@@ -13,10 +13,32 @@ namespace AccountService.Infrastructure.Data.Repositories
             { 
                 Id = new Guid("438af497-aece-4b49-8448-e3f8d142aaa1"), 
                 Balance = 100, 
-                OpenedAt = DateTime.Now, 
+                OpenedAt = new DateTime(2024, 9, 29, 0, 0, 0, DateTimeKind.Utc), 
                 OwnerId = new Guid("7dc4a2af-305c-4ec3-810b-718157d010ae"), 
                 CurrencyCode = "RUB", 
-                Type = AccountType.Checking               
+                Type = AccountType.Checking,
+                Transactions = [
+                    new Transaction()
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = new Guid("438af497-aece-4b49-8448-e3f8d142aaa1"),
+                        CurrencyCode = "RUB",
+                        Description = "transaction desc",
+                        Sum = 200,
+                        TransferTime = new DateTime(2025, 9, 29,  0, 0, 0, DateTimeKind.Utc),
+                        Type = TransactionType.Credit,                                            
+                    },
+                    new Transaction()
+                    {
+                        Id = Guid.NewGuid(),
+                        AccountId = new Guid("438af497-aece-4b49-8448-e3f8d142aaa1"),
+                        CurrencyCode = "RUB",
+                        Description = "transaction desc 2",
+                        Sum = 100,
+                        TransferTime = new DateTime(2025, 9, 29, 0, 0,0, DateTimeKind.Utc),
+                        Type = TransactionType.Debit,                      
+                    }
+                ]
             }
         ];
 
