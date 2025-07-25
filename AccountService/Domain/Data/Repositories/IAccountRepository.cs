@@ -10,5 +10,7 @@ namespace AccountService.Domain.Data.Repositories
         public Task<Account[]> GetAsync(AccountFilter filter);
         public Task UpdateAsync(Account account);
         public Task DeleteAsync(Account account);
+
+        public Task CreateTransactionAsync(Transaction transaction);
     }
 }

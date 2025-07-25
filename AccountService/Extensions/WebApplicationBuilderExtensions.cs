@@ -9,6 +9,7 @@ using AccountService.Features.Accounts.Models;
 using AccountService.Domain.Data.Repositories;
 using AccountService.Application.Abstractions;
 using AccountService.Infrastructure.Services;
+using AccountService.Features.Transactions.Models;
 
 namespace AccountService.Extensions
 {
@@ -17,8 +18,6 @@ namespace AccountService.Extensions
         public static WebApplicationBuilder AddData(this WebApplicationBuilder builder)
         {
             builder.Services.AddSingleton<IAccountRepository, AccountRepository>();
-            builder.Services.AddSingleton<ITransactionRepository, TransactionRepository>();
-
             return builder;
         }
 
@@ -52,6 +51,7 @@ namespace AccountService.Extensions
             {
                 //TODO: добавить маппер профиили
                 cfg.AddProfile<AccountAutoMapperProfile>();
+                cfg.AddProfile<TransactionAutoMapperProfile>();
             });
             return builder;
         }

@@ -55,5 +55,13 @@ namespace AccountService.Infrastructure.Data.Repositories
             _accounts.RemoveAll(a => a.Id == account.Id);
             return Task.CompletedTask;
         }
+
+        public Task CreateTransactionAsync(Transaction transaction)
+        {
+            var account = _accounts.First(a => a.Id == transaction.AccountId);
+            transaction.Id = Guid.NewGuid();
+            account.Transactions.Add(transaction);
+            return Task.CompletedTask;
+        }
     }
 }

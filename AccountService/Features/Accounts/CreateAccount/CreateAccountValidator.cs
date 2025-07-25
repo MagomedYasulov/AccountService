@@ -11,7 +11,7 @@ namespace AccountService.Features.Accounts.CreateAccount
             RuleFor(c => c.OwnerId).NotEmpty();
             RuleFor(c => c.Type).NotNull().IsInEnum();
             RuleFor(c => c.CurrencyCode).NotEmpty().ISO4217().WithMessage("'CurrencyCode' code must be in ISO4217");
-            RuleFor(c => c.InterestRate).Null().When(command => command.Type == AccountType.Checking); 
+            RuleFor(c => c.InterestRate).Null().When(command => command.Type == AccountType.Checking).WithMessage("'InterestRate' mush be null for checking account"); 
             RuleFor(c => c.InterestRate).NotNull().When(command => command.Type != AccountType.Checking);
         }
     }
