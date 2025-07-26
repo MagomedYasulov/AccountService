@@ -21,7 +21,7 @@ namespace AccountService.Features.Accounts.GetAccount
         {
             var account = await _accountRepository.GetByIdAsync(request.Id);
             if (account == null)
-                throw new ServiceException("Account Not Found", $"Account wiht id {request.Id} not found", StatusCodes.Status404NotFound);
+                throw new ServiceException("Account Not Found", $"Account with id {request.Id} not found", StatusCodes.Status404NotFound);
 
             return _mapper.Map<AccountDto>(account);
         }

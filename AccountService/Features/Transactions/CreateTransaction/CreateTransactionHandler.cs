@@ -68,16 +68,16 @@ namespace AccountService.Features.Transactions.CreateTransaction
         private static void AccountValidation(Guid accountId, Account? account, CreateTransactionCommand request, TransactionType operationType)
         {
             if (account == null)
-                throw new ServiceException("Account Not Found", $"Account wiht id {accountId} not found", StatusCodes.Status404NotFound);
+                throw new ServiceException("Account Not Found", $"Account with id {accountId} not found", StatusCodes.Status404NotFound);
 
             if (account.Revoked)
-                throw new ServiceException("Account Revoked", $"Account wiht id {accountId} is revoked", StatusCodes.Status404NotFound);
+                throw new ServiceException("Account Revoked", $"Account with id {accountId} is revoked", StatusCodes.Status404NotFound);
 
             if (request.CurrencyCode != account.CurrencyCode)
                 throw new ServiceException("Currency doesn't match", $"The currency of the account {accountId} and the transaction do not match", StatusCodes.Status409Conflict);
 
             if (request.Type == operationType && account.Balance < request.Sum)
-                throw new ServiceException("Insufficient funds", $"Insufficient funds for the operation", StatusCodes.Status409Conflict);
+                throw new ServiceException("Insufficient funds", "Insufficient funds for the operation", StatusCodes.Status409Conflict);
         }
     }
 }

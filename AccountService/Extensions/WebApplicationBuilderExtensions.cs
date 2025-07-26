@@ -49,7 +49,6 @@ namespace AccountService.Extensions
         {
             builder.Services.AddAutoMapper(cfg =>
             {
-                //TODO: добавить маппер профиили
                 cfg.AddProfile<AccountAutoMapperProfile>();
                 cfg.AddProfile<TransactionAutoMapperProfile>();
             });

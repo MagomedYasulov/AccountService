@@ -9,7 +9,7 @@ namespace AccountService.Infrastructure.Data.Repositories
     {
         private readonly List<Account> _accounts =
         [
-            new Account() 
+            new () 
             { 
                 Id = new Guid("438af497-aece-4b49-8448-e3f8d142aaa1"), 
                 Balance = 150, 
@@ -53,7 +53,7 @@ namespace AccountService.Infrastructure.Data.Repositories
                     },
                 ]
             },
-            new Account()
+            new ()
             {
                 Id = new Guid("b795e3ed-0bed-4326-846f-370ee340191d"),
                 Balance = 250,
@@ -99,10 +99,11 @@ namespace AccountService.Infrastructure.Data.Repositories
             var isOwnerIdNull = filter.OwnerId == null;
             var isRevokedNull = filter.Revoked == null;
 
-            Func<Account, bool> predicate = (account) => (isOwnerIdNull || account.OwnerId == filter.OwnerId) &&
-                                                         (isRevokedNull || account.Revoked == filter.Revoked);
-            var result = _accounts.Where(predicate).ToArray();
+            var result = _accounts.Where(Predicate).ToArray();
             return Task.FromResult(result);
+
+            bool Predicate(Account account) => (isOwnerIdNull || account.OwnerId == filter.OwnerId) &&
+                                               (isRevokedNull || account.Revoked == filter.Revoked);
         }
 
         public Task<Account?> GetByIdAsync(Guid id)

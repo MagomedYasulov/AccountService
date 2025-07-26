@@ -32,10 +32,10 @@ namespace AccountService.Middlewares
             };
             problemDetails.Extensions.Add("traceId", Activity.Current?.Id ?? httpContext.TraceIdentifier);
 
-            var resposne = JsonConvert.SerializeObject(problemDetails, serializeSettings);
+            var response = JsonConvert.SerializeObject(problemDetails, serializeSettings);
 
             httpContext.Response.ContentType = "application/problem+json";
-            await httpContext.Response.WriteAsync(resposne, cancellationToken);
+            await httpContext.Response.WriteAsync(response, cancellationToken);
             return true;
         }
     }
