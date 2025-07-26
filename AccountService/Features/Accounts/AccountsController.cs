@@ -53,7 +53,7 @@ namespace AccountService.Features.Accounts
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id:guid}/statement")]
-        public async Task<ActionResult<AccountDto>> GetStatement(Guid id)
+        public async Task<ActionResult<AccountStatementDto>> GetStatement(Guid id)
         {
             var statementDto = await _mediator.Send(new GetAccountStatementQuery { Id = id });
             return Ok(statementDto);
@@ -66,10 +66,10 @@ namespace AccountService.Features.Accounts
         /// <param name="revoked">получить все счета / анулированные / не анулированные</param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<AccountDto>> Get([FromQuery] Guid? ownerId, [FromQuery] bool? revoked)
+        public async Task<ActionResult<AccountDto[]>> Get([FromQuery] Guid? ownerId, [FromQuery] bool? revoked)
         {
-            var accountDto = await _mediator.Send(new GetAccountsQuery { OwnerId = ownerId, Revoked = revoked });
-            return Ok(accountDto);
+            var accountsDto = await _mediator.Send(new GetAccountsQuery { OwnerId = ownerId, Revoked = revoked });
+            return Ok(accountsDto);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace AccountService.Features.Accounts
         /// <param name="isSoft">Полное / мягкое удаление</param>
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
-        public async Task<ActionResult<AccountDto>> Delete(Guid id, [FromQuery] bool isSoft)
+        public async Task<ActionResult> Delete(Guid id, [FromQuery] bool isSoft)
         {
             await _mediator.Send(new DeleteAccountCommand { Id = id, IsSoft = isSoft });
             return Ok();
