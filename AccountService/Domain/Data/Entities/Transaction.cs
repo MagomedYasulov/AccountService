@@ -4,7 +4,7 @@ namespace AccountService.Domain.Data.Entities
 {
     public class Transaction : BaseEntity
     {
-        public Guid AccountId { get; set; }
+        public Guid AccountId { get; set; } 
         public Account Account { get; set; } = null!;
         public Guid? CounterpartyAccountId { get; set; }
         public Account? CounterpartyAccount { get; set; }
@@ -13,5 +13,7 @@ namespace AccountService.Domain.Data.Entities
         public TransactionType Type { get; set; }
         public string Description { get; set; } = string.Empty;
         public DateTime TransferTime { get; set; }
+
+        public TransactionType CounterpartyType => Type == TransactionType.Credit ? TransactionType.Debit : TransactionType.Credit;
     }
 }

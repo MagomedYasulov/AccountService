@@ -9,6 +9,7 @@ namespace AccountService.Features.Transactions.Models
         public TransactionAutoMapperProfile()
         {
             CreateMap<Transaction, TransactionDto>();
+            CreateMap<CreateTransactionDto, CreateTransactionCommand>();
             CreateMap<CreateTransactionCommand, Transaction>();
         }
     }
