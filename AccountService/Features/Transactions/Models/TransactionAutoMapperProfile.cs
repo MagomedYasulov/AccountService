@@ -2,15 +2,14 @@
 using AccountService.Features.Transactions.CreateTransaction;
 using AutoMapper;
 
-namespace AccountService.Features.Transactions.Models
+namespace AccountService.Features.Transactions.Models;
+
+public class TransactionAutoMapperProfile : Profile
 {
-    public class TransactionAutoMapperProfile : Profile
+    public TransactionAutoMapperProfile()
     {
-        public TransactionAutoMapperProfile()
-        {
-            CreateMap<Transaction, TransactionDto>();
-            CreateMap<CreateTransactionDto, CreateTransactionCommand>();
-            CreateMap<CreateTransactionCommand, Transaction>();
-        }
+        CreateMap<Transaction, TransactionDto>();
+        CreateMap<CreateTransactionDto, CreateTransactionCommand>();
+        CreateMap<CreateTransactionCommand, Transaction>();
     }
 }

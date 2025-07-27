@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace AccountService.Domain.Enums
+namespace AccountService.Domain.Enums;
+
+[JsonConverter(typeof(StringEnumConverter))]
+public enum TransactionType
 {
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum TransactionType
-    {
-        Credit,
-        Debit
-    }
+    Credit,
+    Debit
 }

@@ -1,8 +1,7 @@
 ﻿
-namespace AccountService.Features.Accounts.UpdateAccount
+namespace AccountService.Features.Accounts.UpdateAccount;
+
+public class UpdateAccountDto
 {
-    public class UpdateAccountDto
-    {
-        public decimal? InterestRate { get; set; }
-    }
+    public decimal? InterestRate { get; set; }
 }

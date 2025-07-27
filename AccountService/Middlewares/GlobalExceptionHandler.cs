@@ -1,42 +1,41 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Diagnostics;
 
-namespace AccountService.Middlewares
+namespace AccountService.Middlewares;
+
+public class GlobalExceptionHandler : IExceptionHandler
 {
-    public class GlobalExceptionHandler : IExceptionHandler
+    private readonly ILogger<GlobalExceptionHandler> _logger;
+
+    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
     {
-        private readonly ILogger<GlobalExceptionHandler> _logger;
+        _logger = logger;
+    }
 
-        public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+    {
+        _logger.LogError(exception, "Server error");
+
+        var options = httpContext.RequestServices.GetRequiredService<IOptions<ApiBehaviorOptions>>();
+        var serializeSettings = httpContext.RequestServices.GetRequiredService<IOptions<MvcNewtonsoftJsonOptions>>().Value.SerializerSettings;
+
+        var problemDetails = new ProblemDetails
         {
-            _logger = logger;
-        }
+            Type = options.Value.ClientErrorMapping[500].Link,
+            Title = "Server Error",
+            Status = StatusCodes.Status500InternalServerError,
+            Detail = exception.Message,
+            Instance = httpContext.Request.Path
+        };
+        problemDetails.Extensions.Add("traceId", Activity.Current?.Id ?? httpContext.TraceIdentifier);
 
-        public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
-        {
-            _logger.LogError(exception, exception.Message);
+        var response = JsonConvert.SerializeObject(problemDetails, serializeSettings);
 
-            var options = httpContext.RequestServices.GetRequiredService<IOptions<ApiBehaviorOptions>>();
-            var serializeSettings = httpContext.RequestServices.GetRequiredService<IOptions<MvcNewtonsoftJsonOptions>>().Value.SerializerSettings;
-
-            var problemDetails = new ProblemDetails()
-            {
-                Type = options.Value.ClientErrorMapping[500].Link,
-                Title = "Server Error",
-                Status = StatusCodes.Status500InternalServerError,
-                Detail = exception.Message,
-                Instance = httpContext.Request.Path
-            };
-            problemDetails.Extensions.Add("traceId", Activity.Current?.Id ?? httpContext.TraceIdentifier);
-
-            var response = JsonConvert.SerializeObject(problemDetails, serializeSettings);
-
-            httpContext.Response.ContentType = "application/problem+json";
-            await httpContext.Response.WriteAsync(response, cancellationToken);
-            return true;
-        }
+        httpContext.Response.ContentType = "application/problem+json";
+        await httpContext.Response.WriteAsync(response, cancellationToken);
+        return true;
     }
 }

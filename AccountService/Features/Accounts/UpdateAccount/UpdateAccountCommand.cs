@@ -2,12 +2,11 @@
 using MediatR;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace AccountService.Features.Accounts.UpdateAccount
+namespace AccountService.Features.Accounts.UpdateAccount;
+
+public class UpdateAccountCommand : IRequest<AccountDto>
 {
-    public class UpdateAccountCommand : IRequest<AccountDto>
-    {
-        [SwaggerSchema(ReadOnly = true)]
-        public Guid Id { get; set; }
-        public decimal? InterestRate { get; set; }
-    }
+    [SwaggerSchema(ReadOnly = true)]
+    public Guid Id { get; set; }
+    public decimal? InterestRate { get; set; }
 }

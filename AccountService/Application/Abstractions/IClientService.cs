@@ -1,7 +1,6 @@
-﻿namespace AccountService.Application.Abstractions
+﻿namespace AccountService.Application.Abstractions;
+
+public interface IClientService
 {
-    public interface IClientService
-    {
-        public Task<bool> VerifyClient(Guid clientId);
-    }
+    public Task<bool> VerifyClient(Guid clientId);
 }

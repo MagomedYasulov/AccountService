@@ -1,10 +1,9 @@
 ﻿using AccountService.Features.Accounts.Models;
 using MediatR;
 
-namespace AccountService.Features.Accounts.GetAccountStatement
+namespace AccountService.Features.Accounts.GetAccountStatement;
+
+public class GetAccountStatementQuery : IRequest<AccountStatementDto>
 {
-    public class GetAccountStatementQuery : IRequest<AccountStatementDto>
-    {
-        public Guid Id { get; set; }
-    }
+    public Guid Id { get; set; }
 }

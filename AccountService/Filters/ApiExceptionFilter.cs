@@ -1,83 +1,80 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using AccountService.Exceptions;
+﻿using AccountService.Exceptions;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 
-namespace AccountService.Filters
+namespace AccountService.Filters;
+
+public class ApiExceptionFilter : IExceptionFilter
 {
-    public class ApiExceptionFilter : IExceptionFilter
+    private readonly IOptions<ApiBehaviorOptions> _options;
+    private readonly ILogger<ApiExceptionFilter> _logger;
+
+    public ApiExceptionFilter(ILogger<ApiExceptionFilter> logger, IOptions<ApiBehaviorOptions> options)
     {
-        private readonly IOptions<ApiBehaviorOptions> _options;
-        private readonly ILogger<ApiExceptionFilter> _logger;
+        _options = options;
+        _logger = logger;
+    }
 
-        public ApiExceptionFilter(ILogger<ApiExceptionFilter> logger, IOptions<ApiBehaviorOptions> options)
+    public void OnException(ExceptionContext context)
+    {
+        var exception = context.Exception;
+
+        switch (exception)
         {
-            _options = options;
-            _logger = logger;
-        }
-
-        public void OnException(ExceptionContext context)
-        {
-            var exception = context.Exception;
-
-            if (exception is ServiceException serviceException)
-            {
+            case ServiceException serviceException:
                 HandleServiceException(context , serviceException);
                 return;
-            }
-
-            if (exception is ValidationException validationException)
-            {
+            case ValidationException validationException:
                 HandleValidationException(context, validationException);
                 return;
-            }
-
-            throw exception;
+            default:
+                throw exception;
         }
+    }
 
-        private void HandleValidationException(ExceptionContext context, ValidationException validationException)
+    private void HandleValidationException(ExceptionContext context, ValidationException validationException)
+    {
+        var response = new ProblemDetails
         {
-            var response = new ProblemDetails()
-            {
-                Title = "Validation Exception",
-                Detail = "One or more validation errors occurred",
-                Status = StatusCodes.Status400BadRequest,
-                Type = _options.Value.ClientErrorMapping[StatusCodes.Status400BadRequest].Link,
-                Instance = context.HttpContext.Request.Path,
-            };
+            Title = "Validation Exception",
+            Detail = "One or more validation errors occurred",
+            Status = StatusCodes.Status400BadRequest,
+            Type = _options.Value.ClientErrorMapping[StatusCodes.Status400BadRequest].Link,
+            Instance = context.HttpContext.Request.Path
+        };
 
-            var errorsDesc = validationException.Errors
-                .GroupBy(
-                    x => x.PropertyName,
-                    x => x.ErrorMessage,
-                    (propertyName, errorMessages) => new
-                    {
-                        Key = propertyName,
-                        Values = errorMessages.Distinct().ToArray()
-                    })
-                .ToDictionary(x => x.Key, x => x.Values);
+        var errorsDesc = validationException.Errors
+            .GroupBy(
+                x => x.PropertyName,
+                x => x.ErrorMessage,
+                (propertyName, errorMessages) => new
+                {
+                    Key = propertyName,
+                    Values = errorMessages.Distinct().ToArray()
+                })
+            .ToDictionary(x => x.Key, x => x.Values);
 
-            response.Extensions.Add("errors", errorsDesc);
+        response.Extensions.Add("errors", errorsDesc);
 
-            context.Result = new JsonResult(response) { StatusCode = StatusCodes.Status400BadRequest };
-        }
+        context.Result = new JsonResult(response) { StatusCode = StatusCodes.Status400BadRequest };
+    }
 
-        private void HandleServiceException(ExceptionContext context, ServiceException serviceException)
+    private void HandleServiceException(ExceptionContext context, ServiceException serviceException)
+    {
+        var response = new ProblemDetails
         {
-            var response = new ProblemDetails()
-            {
-                Title = serviceException.Title,
-                Detail = serviceException.Message,
-                Status = serviceException.StatusCode,
-                Type = _options.Value.ClientErrorMapping[serviceException.StatusCode].Link,
-                Instance = context.HttpContext.Request.Path,
-            };
+            Title = serviceException.Title,
+            Detail = serviceException.Message,
+            Status = serviceException.StatusCode,
+            Type = _options.Value.ClientErrorMapping[serviceException.StatusCode].Link,
+            Instance = context.HttpContext.Request.Path
+        };
 
-            _logger.LogWarning("Api method {path} finished with code {statusCode} and error: {error}",
-                             context.HttpContext.Request.Path, serviceException.StatusCode, response.Detail);
+        _logger.LogWarning("Api method {path} finished with code {statusCode} and error: {error}",
+            context.HttpContext.Request.Path, serviceException.StatusCode, response.Detail);
 
-            context.Result = new JsonResult(response) { StatusCode = serviceException.StatusCode };
-        }
+        context.Result = new JsonResult(response) { StatusCode = serviceException.StatusCode };
     }
 }

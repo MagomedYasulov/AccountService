@@ -1,8 +1,7 @@
-﻿namespace AccountService.Domain.Models
+﻿namespace AccountService.Domain.Models;
+
+public class AccountFilter
 {
-    public class AccountFilter
-    {
-        public Guid? OwnerId { get; set; }
-        public bool? Revoked { get; set; }
-    }
+    public Guid? OwnerId { get; set; }
+    public bool? Revoked { get; set; }
 }
