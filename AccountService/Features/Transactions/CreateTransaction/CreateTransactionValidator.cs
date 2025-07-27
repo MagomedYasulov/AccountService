@@ -1,8 +1,10 @@
 ﻿using AccountService.Extensions;
 using FluentValidation;
+using JetBrains.Annotations;
 
 namespace AccountService.Features.Transactions.CreateTransaction;
 
+[UsedImplicitly]
 public class CreateTransactionValidator : AbstractValidator<CreateTransactionCommand>
 {
     public CreateTransactionValidator()

@@ -14,15 +14,8 @@ namespace AccountService.Features.Accounts;
 [Route("api/v1/[controller]")]
 [ApiController]
 [TypeFilter<ApiExceptionFilter>]
-public class AccountsController : ControllerBase
+public class AccountsController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public AccountsController(IMediator mediator)
-    {
-        _mediator = mediator;   
-    }
-
     /// <summary>
     /// Создание счета
     /// </summary>
@@ -31,7 +24,7 @@ public class AccountsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<AccountDto>> Create(CreateAccountCommand command)
     {
-        var accountDto = await _mediator.Send(command);
+        var accountDto = await mediator.Send(command);
         return Created("", accountDto);
     }
 
@@ -43,7 +36,7 @@ public class AccountsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<AccountDto>> Get(Guid id)
     {
-        var accountDto = await _mediator.Send(new GetAccountByIdQuery { Id = id });
+        var accountDto = await mediator.Send(new GetAccountByIdQuery { Id = id });
         return Ok(accountDto);
     }
 
@@ -55,7 +48,7 @@ public class AccountsController : ControllerBase
     [HttpGet("{id:guid}/statement")]
     public async Task<ActionResult<AccountStatementDto>> GetStatement(Guid id)
     {
-        var statementDto = await _mediator.Send(new GetAccountStatementQuery { Id = id });
+        var statementDto = await mediator.Send(new GetAccountStatementQuery { Id = id });
         return Ok(statementDto);
     }
 
@@ -68,7 +61,7 @@ public class AccountsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<AccountDto[]>> Get([FromQuery] Guid? ownerId, [FromQuery] bool? revoked)
     {
-        var accountsDto = await _mediator.Send(new GetAccountsQuery { OwnerId = ownerId, Revoked = revoked });
+        var accountsDto = await mediator.Send(new GetAccountsQuery { OwnerId = ownerId, Revoked = revoked });
         return Ok(accountsDto);
     }
 
@@ -81,7 +74,7 @@ public class AccountsController : ControllerBase
     [HttpPut("{id:guid}/interestRate")]
     public async Task<ActionResult<AccountDto>> Update(Guid id, UpdateAccountDto command)
     {
-        var accountDto = await _mediator.Send(new UpdateAccountCommand { Id = id, InterestRate = command.InterestRate});
+        var accountDto = await mediator.Send(new UpdateAccountCommand { Id = id, InterestRate = command.InterestRate});
         return Ok(accountDto);
     }
 
@@ -94,7 +87,7 @@ public class AccountsController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id, [FromQuery] bool isSoft)
     {
-        await _mediator.Send(new DeleteAccountCommand { Id = id, IsSoft = isSoft });
+        await mediator.Send(new DeleteAccountCommand { Id = id, IsSoft = isSoft });
         return Ok();
     }
 }

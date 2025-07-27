@@ -1,13 +1,7 @@
 ﻿namespace AccountService.Exceptions;
 
-public class ServiceException : Exception
+public class ServiceException(string title, string detail, int statusCode) : Exception(detail)
 {
-    public ServiceException(string title, string detail, int statusCode) : base(detail)
-    {
-        Title = title;
-        StatusCode = statusCode;
-    }
-
-    public int StatusCode { get; set; }
-    public string Title { get; set; }
+    public int StatusCode { get; set; } = statusCode;
+    public string Title { get; set; } = title;
 }

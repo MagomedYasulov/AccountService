@@ -6,17 +6,9 @@ using Microsoft.Extensions.Options;
 
 namespace AccountService.Filters;
 
-public class ApiExceptionFilter : IExceptionFilter
+public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger, IOptions<ApiBehaviorOptions> options)
+    : IExceptionFilter
 {
-    private readonly IOptions<ApiBehaviorOptions> _options;
-    private readonly ILogger<ApiExceptionFilter> _logger;
-
-    public ApiExceptionFilter(ILogger<ApiExceptionFilter> logger, IOptions<ApiBehaviorOptions> options)
-    {
-        _options = options;
-        _logger = logger;
-    }
-
     public void OnException(ExceptionContext context)
     {
         var exception = context.Exception;
@@ -41,7 +33,7 @@ public class ApiExceptionFilter : IExceptionFilter
             Title = "Validation Exception",
             Detail = "One or more validation errors occurred",
             Status = StatusCodes.Status400BadRequest,
-            Type = _options.Value.ClientErrorMapping[StatusCodes.Status400BadRequest].Link,
+            Type = options.Value.ClientErrorMapping[StatusCodes.Status400BadRequest].Link,
             Instance = context.HttpContext.Request.Path
         };
 
@@ -68,11 +60,11 @@ public class ApiExceptionFilter : IExceptionFilter
             Title = serviceException.Title,
             Detail = serviceException.Message,
             Status = serviceException.StatusCode,
-            Type = _options.Value.ClientErrorMapping[serviceException.StatusCode].Link,
+            Type = options.Value.ClientErrorMapping[serviceException.StatusCode].Link,
             Instance = context.HttpContext.Request.Path
         };
 
-        _logger.LogWarning("Api method {path} finished with code {statusCode} and error: {error}",
+        logger.LogWarning("Api method {path} finished with code {statusCode} and error: {error}",
             context.HttpContext.Request.Path, serviceException.StatusCode, response.Detail);
 
         context.Result = new JsonResult(response) { StatusCode = serviceException.StatusCode };

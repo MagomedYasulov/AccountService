@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using JetBrains.Annotations;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace AccountService.Domain.Enums;
@@ -7,6 +8,10 @@ namespace AccountService.Domain.Enums;
 public enum AccountType
 {
     Checking,
+
+    [UsedImplicitly]
     Deposit,
+
+    [UsedImplicitly]
     Credit
 }

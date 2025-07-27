@@ -10,19 +10,10 @@ namespace AccountService.Features.Transactions;
 [Route("api/v1/[controller]")]
 [ApiController]
 [TypeFilter<ApiExceptionFilter>]
-public class TransactionsController : ControllerBase
+public class TransactionsController(
+    IMediator mediator,
+    IMapper mapper) : ControllerBase
 {
-    private readonly IMapper _mapper;
-    private readonly IMediator _mediator;
-
-    public TransactionsController(
-        IMediator mediator,
-        IMapper mapper)
-    {
-        _mapper = mapper;
-        _mediator = mediator;
-    }
-
     /// <summary>
     /// Регистрация транзакций и перевод между счетами
     /// </summary>
@@ -31,8 +22,8 @@ public class TransactionsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TransactionDto>> Create(CreateTransactionDto createDto)
     {
-        var command = _mapper.Map<CreateTransactionCommand>(createDto);
-        var transactionDto = await _mediator.Send(command);
+        var command = mapper.Map<CreateTransactionCommand>(createDto);
+        var transactionDto = await mediator.Send(command);
         return Created("", transactionDto);
     }
 }

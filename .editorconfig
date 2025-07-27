@@ -1,7 +1,0 @@
-root = true
-
-[*.cs]
-# Отключает предупреждения об "использовании primary конструктора"
-resharper_convert_to_primary_constructor_highlighting = none
-# Отключает предупреждения об "неиспользуемом члене"
-resharper_unused_member_global_highlighting = none

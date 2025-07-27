@@ -9,34 +9,24 @@ using MediatR;
 
 namespace AccountService.Features.Transactions.CreateTransaction;
 
-public class CreateTransactionHandler : IRequestHandler<CreateTransactionCommand, TransactionDto>
+public class CreateTransactionHandler(
+    IAccountRepository accountRepository,
+    ICurrencyService currencyService,
+    IMapper mapper)
+    : IRequestHandler<CreateTransactionCommand, TransactionDto>
 {
-    private readonly IMapper _mapper;
-    private readonly IAccountRepository _accountRepository;
-    private readonly ICurrencyService _currencyService;
-
-    public CreateTransactionHandler(
-        IAccountRepository accountRepository,
-        ICurrencyService currencyService,
-        IMapper mapper)
-    {
-        _mapper = mapper;
-        _accountRepository = accountRepository;
-        _currencyService = currencyService;
-    }
-
     public async Task<TransactionDto> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
     {
-        if(!await _currencyService.IsSupportedCurrency(request.CurrencyCode))
+        if(!await currencyService.IsSupportedCurrency(request.CurrencyCode))
             throw new ServiceException("Not Supported Currency Type", $"Currency type {request.CurrencyCode} not supported", StatusCodes.Status409Conflict);
 
-        var account = await _accountRepository.GetByIdAsync(request.AccountId);
+        var account = await accountRepository.GetByIdAsync(request.AccountId);
         AccountValidation(request.AccountId, account, request, TransactionType.Debit);
 
         Account? counterpartyAccount = null;
         if(request.CounterpartyAccountId != null)
         {
-            counterpartyAccount = await _accountRepository.GetByIdAsync(request.CounterpartyAccountId.Value);
+            counterpartyAccount = await accountRepository.GetByIdAsync(request.CounterpartyAccountId.Value);
             AccountValidation(request.CounterpartyAccountId.Value, counterpartyAccount, request, TransactionType.Credit);
         }
 
@@ -54,15 +44,15 @@ public class CreateTransactionHandler : IRequestHandler<CreateTransactionCommand
                 counterpartyAccount.Balance -= request.Sum;
         }
 
-        var transaction = _mapper.Map<Transaction>(request);
+        var transaction = mapper.Map<Transaction>(request);
         transaction.TransferTime = DateTime.UtcNow;
 
-        await _accountRepository.CreateTransactionAsync(transaction);
-        await _accountRepository.UpdateAsync(account);
+        await accountRepository.CreateTransactionAsync(transaction);
+        await accountRepository.UpdateAsync(account);
         if(counterpartyAccount != null)
-            await _accountRepository.UpdateAsync(counterpartyAccount);
+            await accountRepository.UpdateAsync(counterpartyAccount);
 
-        return _mapper.Map<TransactionDto>(transaction);
+        return mapper.Map<TransactionDto>(transaction);
     }
 
     private static void AccountValidation(Guid accountId, Account? account, CreateTransactionCommand request, TransactionType operationType)
