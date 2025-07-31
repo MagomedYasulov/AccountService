@@ -86,4 +86,15 @@ public static class WebApplicationBuilderExtensions
         return builder;
     }
 
+    public static WebApplicationBuilder AddCors(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(c => c.AddPolicy("cors", opt =>
+        {
+            opt.AllowAnyHeader();
+            opt.AllowAnyMethod();
+            opt.AllowCredentials();
+            opt.SetIsOriginAllowed(_ => true);
+        }));
+        return builder;
+    }
 }

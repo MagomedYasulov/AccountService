@@ -18,8 +18,11 @@ public class Program
         builder.AddAutoMapper();
         builder.AddExceptionHandler();
         builder.AddSwagger();
+        builder.AddCors();
 
         var app = builder.Build();
+
+        app.UseCors("cors");
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
