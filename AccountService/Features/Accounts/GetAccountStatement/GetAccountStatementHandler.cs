@@ -16,6 +16,15 @@ public class GetAccountStatementHandler(
         if(account == null)
             throw new ServiceException("Account Not Found", $"Account with id {request.Id} not found", StatusCodes.Status404NotFound);
 
-        return mapper.Map<AccountStatementDto>(account);
+        var dto = mapper.Map<AccountStatementDto>(account);
+
+        var isStartNull = request.Start == null;
+        var isEndNull = request.End == null;
+
+        dto.Transactions = dto.Transactions.Where(Predicate).ToArray();
+        return dto;
+
+        bool Predicate(TransactionStatementDto t) => (isStartNull || t.TransferTime >= request.Start) &&
+                                                     (isEndNull || t.TransferTime <= request.End);
     }
 }
