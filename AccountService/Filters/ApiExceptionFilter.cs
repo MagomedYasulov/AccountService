@@ -44,9 +44,9 @@ public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger, IOptions<Api
                 (propertyName, errorMessages) => new
                 {
                     Key = propertyName,
-                    Values = errorMessages.Distinct().ToArray()
+                    Value = errorMessages.First()
                 })
-            .ToDictionary(x => x.Key, x => x.Values);
+            .ToDictionary(x => x.Key, x => x.Value);
 
         response.Extensions.Add("errors", errorsDesc);
 
