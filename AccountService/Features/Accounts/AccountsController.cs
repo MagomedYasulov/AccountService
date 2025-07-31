@@ -45,8 +45,8 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// Получение выписки по счету
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="start">начало получения</param>
-    /// <param name="end">конец получения</param>
+    /// <param name="start">дата начала</param>
+    /// <param name="end">дата конца</param>
     /// <returns></returns>
     [HttpGet("{id:guid}/statement")]
     public async Task<ActionResult<MbResult<AccountStatementDto>>> GetStatement(Guid id, DateTime? start = null, DateTime? end = null)

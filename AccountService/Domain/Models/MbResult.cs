@@ -4,7 +4,14 @@ namespace AccountService.Domain.Models
 {
     public class MbResult<TValue>
     {
+        /// <summary>
+        /// Запрашиваемые данные
+        /// </summary>
         public TValue? Value { get; set; }
+
+        /// <summary>
+        /// Описание ошибки
+        /// </summary>
         public ProblemDetails? Error { get; set; }
 
 
