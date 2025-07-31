@@ -1,4 +1,5 @@
-﻿using AccountService.Features.Accounts.CreateAccount;
+﻿using AccountService.Domain.Models;
+using AccountService.Features.Accounts.CreateAccount;
 using AccountService.Features.Accounts.DeleteAccount;
 using AccountService.Features.Accounts.GetAccount;
 using AccountService.Features.Accounts.GetAccounts;
@@ -22,10 +23,10 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <param name="command"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ActionResult<AccountDto>> Create(CreateAccountCommand command)
+    public async Task<ActionResult<MbResult<AccountDto>>> Create(CreateAccountCommand command)
     {
         var accountDto = await mediator.Send(command);
-        return Created("", accountDto);
+        return Created("", new MbResult<AccountDto>(accountDto));
     }
 
     /// <summary>
@@ -34,10 +35,10 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<AccountDto>> Get(Guid id)
+    public async Task<ActionResult<MbResult<AccountDto>>> Get(Guid id)
     {
         var accountDto = await mediator.Send(new GetAccountByIdQuery { Id = id });
-        return Ok(accountDto);
+        return Ok(new MbResult<AccountDto>(accountDto));
     }
 
     /// <summary>
@@ -48,10 +49,10 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <param name="end">конец получения</param>
     /// <returns></returns>
     [HttpGet("{id:guid}/statement")]
-    public async Task<ActionResult<AccountStatementDto>> GetStatement(Guid id, DateTime? start = null, DateTime? end = null)
+    public async Task<ActionResult<MbResult<AccountStatementDto>>> GetStatement(Guid id, DateTime? start = null, DateTime? end = null)
     {
         var statementDto = await mediator.Send(new GetAccountStatementQuery { Id = id, Start = start, End = end });
-        return Ok(statementDto);
+        return Ok(new MbResult<AccountStatementDto>(statementDto));
     }
 
     /// <summary>
@@ -61,10 +62,10 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <param name="revoked">получить все счета / анулированные / не анулированные</param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ActionResult<AccountDto[]>> Get([FromQuery] Guid? ownerId, [FromQuery] bool? revoked)
+    public async Task<ActionResult<MbResult<AccountDto[]>>> Get([FromQuery] Guid? ownerId, [FromQuery] bool? revoked)
     {
         var accountsDto = await mediator.Send(new GetAccountsQuery { OwnerId = ownerId, Revoked = revoked });
-        return Ok(accountsDto);
+        return Ok(new MbResult<AccountDto[]>(accountsDto));
     }
 
     /// <summary>
@@ -74,10 +75,10 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <param name="command"></param>
     /// <returns></returns>
     [HttpPut("{id:guid}/interestRate")]
-    public async Task<ActionResult<AccountDto>> Update(Guid id, UpdateAccountDto command)
+    public async Task<ActionResult<MbResult<AccountDto>>> Update(Guid id, UpdateAccountDto command)
     {
         var accountDto = await mediator.Send(new UpdateAccountCommand { Id = id, InterestRate = command.InterestRate});
-        return Ok(accountDto);
+        return Ok(new MbResult<AccountDto>(accountDto));
     }
 
     /// <summary>
