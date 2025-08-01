@@ -19,6 +19,8 @@ public class Program
         builder.AddExceptionHandler();
         builder.AddSwagger();
         builder.AddCors();
+        builder.AddAuthentication();
+        builder.AddAuthorization();
 
         var app = builder.Build();
 
@@ -31,6 +33,9 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        app.UseRouting();
+
+        app.UseAuthentication();
         app.UseAuthorization();
 
 

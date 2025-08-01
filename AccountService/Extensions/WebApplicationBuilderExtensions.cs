@@ -8,6 +8,8 @@ using AccountService.Infrastructure.Services;
 using AccountService.Middlewares;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -73,6 +75,32 @@ public static class WebApplicationBuilderExtensions
                 Title = "AccountService API",
                 Version = "v1"
             });
+
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "AccountService.xml"));
         });
 
@@ -95,6 +123,34 @@ public static class WebApplicationBuilderExtensions
             opt.AllowCredentials();
             opt.SetIsOriginAllowed(_ => true);
         }));
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddAuthentication(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = builder.Configuration["Jwt:Authority"];
+                options.Audience = builder.Configuration["Jwt:Audience"];
+                options.RequireHttpsMetadata = false;
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    NameClaimType = "preferred_username",
+                    RoleClaimType = "roles"
+                };
+            });
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddAuthorization(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddAuthorization();
         return builder;
     }
 }

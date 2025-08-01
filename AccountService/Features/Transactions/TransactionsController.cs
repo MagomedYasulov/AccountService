@@ -5,10 +5,12 @@ using AccountService.Features.Transactions.Models;
 using AccountService.Filters;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccountService.Features.Transactions;
 
+[Authorize]
 [Route("api/v1/[controller]")]
 [ApiController]
 [TypeFilter<ApiExceptionFilter>]

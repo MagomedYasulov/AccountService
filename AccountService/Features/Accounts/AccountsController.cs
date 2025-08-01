@@ -8,10 +8,12 @@ using AccountService.Features.Accounts.Models;
 using AccountService.Features.Accounts.UpdateAccount;
 using AccountService.Filters;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccountService.Features.Accounts;
 
+[Authorize]
 [Route("api/v1/[controller]")]
 [ApiController]
 [TypeFilter<ApiExceptionFilter>]
