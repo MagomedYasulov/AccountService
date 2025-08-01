@@ -1,0 +1,29 @@
+services:
+    keycloak-service:
+        image: quay.io/keycloak/keycloak:latest
+        ports:
+            - "8080:8080"
+        environment:
+          KEYCLOAK_ADMIN: admin
+          KEYCLOAK_ADMIN_PASSWORD: admin
+        networks:
+            - services-network
+        volumes:
+          - ./realms:/opt/keycloak/data/import
+        command: ["start-dev", "--import-realm"]
+
+    account-service:
+        build:
+            context: .
+            dockerfile: AccountService/Dockerfile
+        ports:
+            - "5080:8080"
+            - "5081:8081"
+        networks:
+            - services-network
+        depends_on:
+                - keycloak-service
+  
+networks:
+    services-network:    
+        driver: bridge

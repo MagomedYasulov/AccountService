@@ -1,5 +1,5 @@
 {
-  "realm": "bank-service-realm",
+  "realm": "bank-service",
   "enabled": true,
   "users": [
     {
