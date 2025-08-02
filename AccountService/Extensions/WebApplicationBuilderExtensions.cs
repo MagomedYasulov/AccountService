@@ -88,7 +88,7 @@ public static class WebApplicationBuilderExtensions
                         {
                             {"openid", "openid" },
                             {"profile", "profile" }
-                        }
+                        }                      
                     }
                 }
             });
@@ -105,8 +105,8 @@ public static class WebApplicationBuilderExtensions
                         },
                         In = ParameterLocation.Header,
                         Name = "Bearer",
-                        Scheme = "Bearer"
-                    },
+                        Scheme = "Bearer"                       
+                    },                   
                     Array.Empty<string>()
                 }
             });
