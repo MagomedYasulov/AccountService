@@ -53,7 +53,7 @@ docker-compose up --build
 Swagger Autorization
 ---
 Для авторизации в Swagger можно использовать Keycloak  (OAuth2,  implicit) , с client_id `account-service`
-![Swagger Keycloak Auth UI](images/swagger-keycloak-auth.png)
+![Swagger Keycloak Auth UI](images/swagger-keycloak-auth.png)  
 После чего на странице авторизации Keycloak ввести данные импортированного пользователя
 - Логин: `user`
 - Пароль: `1234`
