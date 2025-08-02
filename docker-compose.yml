@@ -22,7 +22,7 @@ services:
         networks:
             - services-network
         depends_on:
-                - keycloak-service
+            - keycloak-service
   
 networks:
     services-network:    

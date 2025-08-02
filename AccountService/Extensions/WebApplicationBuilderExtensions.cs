@@ -76,6 +76,42 @@ public static class WebApplicationBuilderExtensions
                 Version = "v1"
             });
 
+            options.AddSecurityDefinition("Keycloak", new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.OAuth2,
+                Flows = new OpenApiOAuthFlows()
+                {
+                    Implicit = new OpenApiOAuthFlow()
+                    {
+                        AuthorizationUrl = new Uri(builder.Configuration["Keycloak:AuthorizationUrl"]!),
+                        Scopes = new Dictionary<string, string>()
+                        {
+                            {"openid", "openid" },
+                            {"profile", "profile" }
+                        }
+                    }
+                }
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Keycloak"
+                        },
+                        In = ParameterLocation.Header,
+                        Name = "Bearer",
+                        Scheme = "Bearer"
+                    },
+                    Array.Empty<string>()
+                }
+            });
+
+
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
@@ -87,19 +123,19 @@ public static class WebApplicationBuilderExtensions
             });
 
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
                 {
+                    new OpenApiSecurityScheme
                     {
-                        new OpenApiSecurityScheme
+                        Reference = new OpenApiReference
                         {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                });
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
 
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "AccountService.xml"));
         });
@@ -140,9 +176,7 @@ public static class WebApplicationBuilderExtensions
                     ValidateIssuer = true,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidateAudience = true,
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    NameClaimType = "preferred_username",
-                    RoleClaimType = "roles"
+                    ValidAudience = builder.Configuration["Jwt:Audience"]
                 };
             });
         return builder;

@@ -1,11 +1,17 @@
 {
   "realm": "bank-service",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "resetPasswordAllowed": true,
+  "verifyEmail": false,
   "enabled": true,
   "users": [
     {
       "username": "user",
       "enabled": true,
       "email": "user@example.com",
+      "firstName": "username",
+      "lastName": "userlastname",
       "credentials": [
         {
           "type": "password",
@@ -20,10 +26,30 @@
       "clientId": "account-service",
       "enabled": true,
       "publicClient": true,
-      "redirectUris": ["https://www.keycloak.org/app/*"],
+      "redirectUris": ["http://localhost:5080/*", "https://localhost:5081/*", "http://127.0.0.1:5080/*", "https://127.0.0.1:5081/*"],
+      "webOrigins": [
+        "http://127.0.0.1:5080",
+        "https://127.0.0.1:5081",
+        "http://localhost:5080",
+        "https://localhost:5081"
+      ],
       "protocol": "openid-connect",
+      "implicitFlowEnabled": true,
       "standardFlowEnabled": true,
-      "directAccessGrantsEnabled": true
+      "directAccessGrantsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "audience-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "account",
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        }
+      ]
     }
   ]
 }
