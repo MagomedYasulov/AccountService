@@ -79,12 +79,12 @@ public static class WebApplicationBuilderExtensions
             options.AddSecurityDefinition("Keycloak", new OpenApiSecurityScheme
             {
                 Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows()
+                Flows = new OpenApiOAuthFlows
                 {
-                    Implicit = new OpenApiOAuthFlow()
+                    Implicit = new OpenApiOAuthFlow
                     {
                         AuthorizationUrl = new Uri(builder.Configuration["Keycloak:AuthorizationUrl"]!),
-                        Scopes = new Dictionary<string, string>()
+                        Scopes = new Dictionary<string, string>
                         {
                             {"openid", "openid" },
                             {"profile", "profile" }

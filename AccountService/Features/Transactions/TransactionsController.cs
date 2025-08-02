@@ -1,5 +1,4 @@
 ﻿using AccountService.Domain.Models;
-using AccountService.Features.Accounts.Models;
 using AccountService.Features.Transactions.CreateTransaction;
 using AccountService.Features.Transactions.Models;
 using AccountService.Filters;
