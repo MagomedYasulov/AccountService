@@ -56,8 +56,8 @@ Swagger Autorization
 ![Swagger Keycloak Auth UI](images/swagger-keycloak-auth.png)  
 После чего на странице авторизации Keycloak ввести данные импортированного пользователя
 - Логин: `user`
-- Пароль: `1234`
-Либо зарегистрировать нового пользователя
+- Пароль: `1234`  
+Либо зарегистрировать нового пользователя  
 ![Keycloak Auth Page](images/keycloak-auth-page.png)
 
 Так можно получить токен напрямую используя curl или Postman и вставить его в Swagger
