@@ -1,4 +1,5 @@
-﻿using AccountService.Exceptions;
+﻿using AccountService.Domain.Models;
+using AccountService.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -44,13 +45,14 @@ public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger, IOptions<Api
                 (propertyName, errorMessages) => new
                 {
                     Key = propertyName,
-                    Values = errorMessages.Distinct().ToArray()
+                    Value = errorMessages.First()
                 })
-            .ToDictionary(x => x.Key, x => x.Values);
+            .ToDictionary(x => x.Key, x => x.Value);
 
         response.Extensions.Add("errors", errorsDesc);
 
-        context.Result = new JsonResult(response) { StatusCode = StatusCodes.Status400BadRequest };
+        var result = new MbError(response);
+        context.Result = new JsonResult(result) { StatusCode = StatusCodes.Status400BadRequest };
     }
 
     private void HandleServiceException(ExceptionContext context, ServiceException serviceException)
@@ -67,6 +69,7 @@ public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger, IOptions<Api
         logger.LogWarning("Api method {path} finished with code {statusCode} and error: {error}",
             context.HttpContext.Request.Path, serviceException.StatusCode, response.Detail);
 
-        context.Result = new JsonResult(response) { StatusCode = serviceException.StatusCode };
+        var result = new MbError(response);
+        context.Result = new JsonResult(result) { StatusCode = serviceException.StatusCode };
     }
 }
