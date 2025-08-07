@@ -24,6 +24,8 @@ public class Program
 
         var app = builder.Build();
 
+        app.MigrateDB();
+
         app.UseCors("cors");
 
         // Configure the HTTP request pipeline.

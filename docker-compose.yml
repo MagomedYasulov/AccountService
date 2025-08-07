@@ -12,6 +12,18 @@ services:
           - ./realms:/opt/keycloak/data/import
         command: ["start-dev", "--import-realm"]
 
+    postgres-db:
+        container_name: postgres
+        image: postgres:latest
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: 1234
+            POSTGRES_DB: AccountServiceDB
+        ports:
+           - 5432:5432
+        networks:
+            - services-network
+
     account-service:
         build:
             context: .
@@ -22,6 +34,7 @@ services:
             - services-network
         depends_on:
             - keycloak-service
+            - postgres-db
   
 networks:
     services-network:    
