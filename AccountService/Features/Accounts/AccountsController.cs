@@ -26,8 +26,8 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(MbResult<AccountDto>), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<MbResult<AccountDto>>> Create(CreateAccountCommand command)
     {
         var accountDto = await mediator.Send(command);
@@ -41,7 +41,7 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <returns></returns>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(MbResult<AccountDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MbResult<AccountDto>>> Get(Guid id)
     {
         var accountDto = await mediator.Send(new GetAccountByIdQuery { Id = id });
@@ -57,7 +57,7 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <returns></returns>
     [HttpGet("{id:guid}/statement")]
     [ProducesResponseType(typeof(MbResult<AccountStatementDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MbResult<AccountStatementDto>>> GetStatement(Guid id, DateTime? start = null, DateTime? end = null)
     {
         var statementDto = await mediator.Send(new GetAccountStatementQuery { Id = id, Start = start, End = end });
@@ -86,9 +86,9 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <returns></returns>
     [HttpPut("{id:guid}/interestRate")]
     [ProducesResponseType(typeof(MbResult<AccountDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<MbResult<AccountDto>>> Update(Guid id, UpdateAccountDto command)
     {
         var accountDto = await mediator.Send(new UpdateAccountCommand { Id = id, InterestRate = command.InterestRate});
@@ -103,7 +103,7 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <returns></returns>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(typeof(MbResult<AccountDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(Guid id, [FromQuery] bool isSoft)
     {
         await mediator.Send(new DeleteAccountCommand { Id = id, IsSoft = isSoft });

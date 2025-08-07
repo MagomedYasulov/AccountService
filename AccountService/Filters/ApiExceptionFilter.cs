@@ -51,11 +51,7 @@ public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger, IOptions<Api
 
         response.Extensions.Add("errors", errorsDesc);
 
-        var result = new MbResult
-        {
-            Error = response
-        };
-
+        var result = new MbError(response);
         context.Result = new JsonResult(result) { StatusCode = StatusCodes.Status400BadRequest };
     }
 
@@ -73,11 +69,7 @@ public class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger, IOptions<Api
         logger.LogWarning("Api method {path} finished with code {statusCode} and error: {error}",
             context.HttpContext.Request.Path, serviceException.StatusCode, response.Detail);
 
-        var result = new MbResult
-        {
-            Error = response
-        };
-
+        var result = new MbError(response);
         context.Result = new JsonResult(result) { StatusCode = serviceException.StatusCode };
     }
 }

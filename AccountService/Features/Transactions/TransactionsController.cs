@@ -24,9 +24,9 @@ public class TransactionsController(
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(MbResult<TransactionDto>), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(MbResult), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<MbResult<TransactionDto>>> Create(CreateTransactionDto createDto)
     {
         var command = mapper.Map<CreateTransactionCommand>(createDto);

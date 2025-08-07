@@ -1,28 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using JetBrains.Annotations;
 
 namespace AccountService.Domain.Models;
 
-public class MbResult<TValue>
+public class MbResult<TValue>(TValue value)
 {
     /// <summary>
     /// Запрашиваемые данные
     /// </summary>
-    public TValue? Value { get; set; }
-
-    /// <summary>
-    /// Описание ошибки
-    /// </summary>
-    public ProblemDetails? Error { get; set; }
-
-
-    public MbResult() { }
-
-    public MbResult(TValue value)
-    {
-        Value = value;
-    }
+    [UsedImplicitly]
+    public TValue Value { get; set; } = value;
 }
-
-public class MbResult : MbResult<DefaultType>;
-
-public class DefaultType;
