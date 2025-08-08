@@ -7,6 +7,7 @@ using AccountService.Infrastructure.Data;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace AccountService.Features.Transactions.CreateTransaction;
 
@@ -31,7 +32,7 @@ public class CreateTransactionHandler(
             AccountValidation(request.CounterpartyAccountId.Value, counterpartyAccount, request, TransactionType.Credit);
         }
 
-        using var dbTransaction = dbContext.Database.BeginTransaction();
+        using var dbTransaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
         try
         {
