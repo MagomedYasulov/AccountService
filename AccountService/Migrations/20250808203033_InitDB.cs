@@ -24,6 +24,7 @@ namespace AccountService.Migrations
                     OpenedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ClosedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Revoked = table.Column<bool>(type: "boolean", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>

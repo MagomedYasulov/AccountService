@@ -1,15 +1,15 @@
 ﻿using AccountService.Application.Abstractions;
 using AccountService.Domain.Data.Entities;
-using AccountService.Domain.Data.Repositories;
 using AccountService.Exceptions;
 using AccountService.Features.Accounts.Models;
+using AccountService.Infrastructure.Data;
 using AutoMapper;
 using MediatR;
 
 namespace AccountService.Features.Accounts.CreateAccount;
 
 public class CreateAccountHandler(
-    IAccountRepository accountRepository,
+    AppDbContext dbContext,
     IClientService clientService,
     ICurrencyService currencyService,
     IMapper mapper)
@@ -32,7 +32,8 @@ public class CreateAccountHandler(
             OpenedAt = DateTime.UtcNow
         };
 
-        await accountRepository.CreateAsync(account);
+        await dbContext.Accounts.AddAsync(account, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
         return mapper.Map<AccountDto>(account);
     }
 }

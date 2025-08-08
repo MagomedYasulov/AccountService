@@ -1,10 +1,8 @@
 ﻿using AccountService.Application.Abstractions;
 using AccountService.Application.PipelineBehaviors;
-using AccountService.Domain.Data.Repositories;
 using AccountService.Features.Accounts.Models;
 using AccountService.Features.Transactions.Models;
 using AccountService.Infrastructure.Data;
-using AccountService.Infrastructure.Data.Repositories;
 using AccountService.Infrastructure.Services;
 using AccountService.Middlewares;
 using FluentValidation;
@@ -23,7 +21,6 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddData(this WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-        builder.Services.AddSingleton<IAccountRepository, AccountRepository>();
         return builder;
     }
 

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AccountService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250807215154_InitDB")]
+    [Migration("20250808203033_InitDB")]
     partial class InitDB
     {
         /// <inheritdoc />
@@ -58,6 +58,12 @@ namespace AccountService.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 

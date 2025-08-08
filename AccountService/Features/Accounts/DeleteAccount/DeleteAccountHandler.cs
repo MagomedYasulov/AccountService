@@ -1,14 +1,15 @@
-﻿using AccountService.Domain.Data.Repositories;
-using AccountService.Exceptions;
+﻿using AccountService.Exceptions;
+using AccountService.Infrastructure.Data;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace AccountService.Features.Accounts.DeleteAccount;
 
-public class DeleteAccountHandler(IAccountRepository accountRepository) : IRequestHandler<DeleteAccountCommand>
+public class DeleteAccountHandler(AppDbContext dbContext) : IRequestHandler<DeleteAccountCommand>
 {
     public async Task Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
     {
-        var account = await accountRepository.GetByIdAsync(request.Id);
+        var account = await dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken: cancellationToken);
         if(account == null)
             throw new ServiceException("Account Not Found", $"Account with id {request.Id} not found", StatusCodes.Status404NotFound);
 
@@ -16,11 +17,11 @@ public class DeleteAccountHandler(IAccountRepository accountRepository) : IReque
         {
             account.Revoked = true;
             account.ClosedAt = DateTime.UtcNow;
-            await accountRepository.UpdateAsync(account);
         }
         else
         {
-            await accountRepository.DeleteAsync(account);
+            dbContext.Accounts.Remove(account);
         }
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

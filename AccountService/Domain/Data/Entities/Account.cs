@@ -18,4 +18,9 @@ public class Account : BaseEntity
     /// Soft delete
     /// </summary>
     public bool Revoked { get; set; }
+
+    /// <summary>
+    /// Оптимистичная блокировка через concurrency‑token (xmin)
+    /// </summary>
+    public uint xmin { get; set; }
 }

@@ -16,6 +16,13 @@ namespace AccountService.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>()
+                .Property(e => e.xmin)
+                .HasColumnName("xmin")
+                .HasColumnType("xid")
+                .IsRowVersion()
+                .ValueGeneratedOnAddOrUpdate();
+
+            modelBuilder.Entity<Account>()
                 .HasIndex(e => e.OwnerId)
                 .HasDatabaseName("IX_Account_OwnerId")
                 .HasMethod("hash");
