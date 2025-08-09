@@ -11,6 +11,8 @@ public class Account : BaseEntity
     public decimal? InterestRate { get; set; }
     public DateTime OpenedAt { get; set; }
     public DateTime? ClosedAt { get; set; }
+
+    public DateTime? LastAccruedAt { get; set; }
     public List<Transaction> Transactions { get; set; } = [];
     public List<Transaction> CounterpartyTransactions { get; set; } = [];
 

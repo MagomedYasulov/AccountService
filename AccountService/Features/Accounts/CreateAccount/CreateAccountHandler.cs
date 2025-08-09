@@ -1,5 +1,6 @@
 ﻿using AccountService.Application.Abstractions;
 using AccountService.Domain.Data.Entities;
+using AccountService.Domain.Enums;
 using AccountService.Exceptions;
 using AccountService.Features.Accounts.Models;
 using AccountService.Infrastructure.Data;
@@ -29,7 +30,8 @@ public class CreateAccountHandler(
             CurrencyCode = request.CurrencyCode,
             InterestRate = request.InterestRate,
             Type = request.Type!.Value,
-            OpenedAt = DateTime.UtcNow
+            OpenedAt = DateTime.UtcNow,
+            ClosedAt = request.Type == AccountType.Deposit ? request.ClosedAt : null
         };
 
         await dbContext.Accounts.AddAsync(account, cancellationToken);
