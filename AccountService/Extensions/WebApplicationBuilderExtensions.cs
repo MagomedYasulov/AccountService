@@ -6,6 +6,8 @@ using AccountService.Infrastructure.Data;
 using AccountService.Infrastructure.Services;
 using AccountService.Middlewares;
 using FluentValidation;
+using Hangfire;
+using Hangfire.PostgreSql;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -147,6 +149,7 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
         builder.Services.AddSingleton<IClientService, ClientService>();
+        builder.Services.AddScoped<IInterestAccrualService, InterestAccrualService>();
         return builder;
     }
 
@@ -185,6 +188,21 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddAuthorization(this WebApplicationBuilder builder)
     {
         builder.Services.AddAuthorization();
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddHangfire(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddHangfire(config =>  config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(opt => {
+                    opt.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"));
+                }));
+
+
+        builder.Services.AddHangfireServer();
         return builder;
     }
 }
