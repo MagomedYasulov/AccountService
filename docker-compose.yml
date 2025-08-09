@@ -23,6 +23,8 @@ services:
            - 5432:5432
         networks:
             - services-network
+        volumes:
+            - postgres_data:/var/lib/postgresql/data 
 
     account-service:
         build:
@@ -39,3 +41,6 @@ services:
 networks:
     services-network:    
         driver: bridge
+
+volumes:
+    postgres_data:
