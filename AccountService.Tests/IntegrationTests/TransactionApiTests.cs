@@ -1,4 +1,8 @@
-﻿using AccountService.Infrastructure.Data;
+﻿using AccountService.Domain.Enums;
+using AccountService.Domain.Models;
+using AccountService.Features.Accounts.Models;
+using AccountService.Features.Transactions.CreateTransaction;
+using AccountService.Infrastructure.Data;
 using AccountService.Tests.Extentions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
@@ -8,9 +12,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using System.Net;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Encodings.Web;
 using Testcontainers.PostgreSql;
+using Xunit.Abstractions;
 
 namespace AccountService.Tests.IntegrationTests
 {
@@ -81,9 +89,11 @@ namespace AccountService.Tests.IntegrationTests
     public class TransactionApiTests //: IClassFixture<CustomWebApplicationFactory>
     {
         private readonly CustomWebApplicationFactory _factory;
+        private readonly ITestOutputHelper _output;
 
-        public TransactionApiTests(CustomWebApplicationFactory factory)
+        public TransactionApiTests(CustomWebApplicationFactory factory, ITestOutputHelper output)
         {
+            _output = output;
             _factory = factory;
         }
 
@@ -92,13 +102,95 @@ namespace AccountService.Tests.IntegrationTests
         public async Task Parraler_Transaction_MustPreservationTotalBalance()
         {
             // Arrange
+            var account1Id = new Guid("45342ce3-c18e-4572-be2f-e1563d2c0f6d");
+            var account2Id = new Guid("215e98c9-c890-4a64-9664-07a755b9f01a");
+
+            var debitTransactionAccount1 = new CreateTransactionDto()
+            {
+                AccountId = account1Id,
+                CounterpartyAccountId = account2Id,
+                CurrencyCode = "RUB",
+                Sum = 100,
+                Type = TransactionType.Debit
+            };
+
+            var debitTransactionAccount2 = new CreateTransactionDto()
+            {
+                AccountId = account2Id,
+                CounterpartyAccountId = account1Id,
+                CurrencyCode = "RUB",
+                Sum = 100,
+                Type = TransactionType.Debit
+            };
+
+            var json1 = JsonConvert.SerializeObject(debitTransactionAccount1);
+            var json2 = JsonConvert.SerializeObject(debitTransactionAccount2);
+
+            var httpContent1 = new StringContent(json1, Encoding.UTF8, "application/json");
+            var htppContent2 = new StringContent(json2, Encoding.UTF8, "application/json");
+
             var client = _factory.CreateClient();
 
             // Act
-            var response = await client.GetAsync("/api/v1/accounts");
+            var tasks = new Task[50];
+            for(int i = 0; i < 50; i++)
+            {
+                if(i % 2 == 0)
+                    tasks[i] = client.PostAsync("/api/v1/transactions", httpContent1);
+                else
+                    tasks[i] = client.PostAsync("/api/v1/transactions", htppContent2);
+            }
+
+            await Task.WhenAll(tasks);
+
+            var response1 = await client.GetAsync($"/api/v1/accounts/{account1Id}/statement");
+            var response2 = await client.GetAsync($"/api/v1/accounts/{account2Id}/statement");
 
             // Assert
-            Assert.True(response.IsSuccessStatusCode);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+
+            var accountStatement1 = JsonConvert.DeserializeObject<MbResult<AccountStatementDto>>(await response1.Content.ReadAsStringAsync())?.Value;
+            var accountStatement2 = JsonConvert.DeserializeObject<MbResult<AccountStatementDto>>(await response2.Content.ReadAsStringAsync())?.Value;
+
+            Assert.NotNull(accountStatement1);
+            Assert.NotNull(accountStatement2);
+
+            _output.WriteLine($"Account1 transactions count {accountStatement1.Transactions.Length}");
+            _output.WriteLine($"Account2 transactions count {accountStatement2.Transactions.Length}");
+            Assert.True(accountStatement1.Transactions.Length >= 2); //Минимун 2 потому что в бд уже есть 1 транзакция
+            Assert.True(accountStatement2.Transactions.Length >= 1);
+
+            Assert.Equal(100, accountStatement1.Balance + accountStatement2.Balance);
+            Assert.True(accountStatement1.Balance >= 0);
+            Assert.True(accountStatement2.Balance >= 0);
+
+            var sum = 0M;
+            foreach(var transaction in accountStatement1.Transactions.OrderBy(t => t.TransferTime))
+            {
+                if (transaction.Type == TransactionType.Debit)
+                    sum -= transaction.Sum;
+                else
+                    sum += transaction.Sum;
+
+                Assert.True(sum <= 100);
+                Assert.True(sum >= 0);
+            }
+            Assert.Equal(sum, accountStatement1.Balance);
+
+            sum = 0M;
+            foreach (var transaction in accountStatement2.Transactions.OrderBy(t => t.TransferTime))
+            {
+                if (transaction.Type == TransactionType.Debit)
+                    sum -= transaction.Sum;
+                else
+                    sum += transaction.Sum;
+
+                Assert.True(sum >= 0);
+                Assert.True(sum <= 100);
+            }
+            Assert.Equal(sum, accountStatement2.Balance);
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using AccountService.Domain.Data.Entities;
+using AccountService.Domain.Enums;
 using AccountService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,17 +12,28 @@ namespace AccountService.Tests.Extentions
         {
             var account1 = new Account()
             {
-                Balance = 500000,
+                Id = new Guid("45342ce3-c18e-4572-be2f-e1563d2c0f6d"),
+                Balance = 100,
                 CurrencyCode = "RUB",
-                Type = Domain.Enums.AccountType.Checking,
+                Type = AccountType.Checking,
                 OwnerId = Guid.NewGuid(),
+                Transactions = [
+                    new Transaction()
+                    {
+                        CurrencyCode = "RUB",
+                        Sum = 100,
+                        TransferTime = DateTime.UtcNow,
+                        Type = TransactionType.Credit
+                    }
+                ]
             };
 
             var account2 = new Account()
             {
-                Balance = 500000,
+                Id = new Guid("215e98c9-c890-4a64-9664-07a755b9f01a"),
+                Balance = 0,
                 CurrencyCode = "RUB",
-                Type = Domain.Enums.AccountType.Checking,
+                Type = AccountType.Checking,
                 OwnerId = Guid.NewGuid(),
             };
 
