@@ -20,7 +20,7 @@ public class GetAccountsHandler(
         var isOwnerIdNull = filter.OwnerId == null;
         var isRevokedNull = filter.Revoked == null;
 
-        Expression<Func<Account, bool>> predicate = (account) => (isOwnerIdNull || account.OwnerId == filter.OwnerId) &&
+        Expression<Func<Account, bool>> predicate = account => (isOwnerIdNull || account.OwnerId == filter.OwnerId) &&
                                                                  (isRevokedNull || account.Revoked == filter.Revoked);
 
         var accounts = await dbContext.Accounts.AsNoTracking().Where(predicate).ToArrayAsync(cancellationToken: cancellationToken);

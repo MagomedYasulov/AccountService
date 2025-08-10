@@ -14,8 +14,12 @@ public class Transaction : BaseEntity
     [UsedImplicitly]
     public Account? CounterpartyAccount { get; set; }
     public decimal Sum { get; set; }
+
+    // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string CurrencyCode { get; set; } = string.Empty;
     public TransactionType Type { get; set; }
+
+    // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string Description { get; set; } = string.Empty;
     public DateTime TransferTime { get; set; }
 

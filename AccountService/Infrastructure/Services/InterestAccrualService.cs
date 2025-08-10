@@ -3,26 +3,18 @@ using AccountService.Domain.Enums;
 using AccountService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace AccountService.Infrastructure.Services
+namespace AccountService.Infrastructure.Services;
+
+public class InterestAccrualService(AppDbContext dbContext) : IInterestAccrualService
 {
-    public class InterestAccrualService : IInterestAccrualService
+    public async Task AccrueInterestForAllDeposits()
     {
-        private readonly AppDbContext _dbContext;
+        var depositAccountIds = await dbContext.Accounts.Where(a => a.Type == AccountType.Deposit).Select(a => a.Id).ToArrayAsync();
 
-        public InterestAccrualService(AppDbContext dbContext)
+        foreach (var accountId in depositAccountIds)
         {
-            _dbContext = dbContext;
-        }
-
-        public async Task AccrueInterestForAllDeposits()
-        {
-            var depositAccountIds = await _dbContext.Accounts.Where(a => a.Type == AccountType.Deposit).Select(a => a.Id).ToArrayAsync();
-
-            foreach (var accountId in depositAccountIds)
-            {
-                await _dbContext.Database.ExecuteSqlInterpolatedAsync(
-                    $"CALL public.accrue_interest({accountId})");
-            }
+            await dbContext.Database.ExecuteSqlInterpolatedAsync(
+                $"CALL public.accrue_interest({accountId})");
         }
     }
 }

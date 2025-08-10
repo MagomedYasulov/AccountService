@@ -1,7 +1,9 @@
-﻿namespace AccountService.Application.Abstractions
+﻿using JetBrains.Annotations;
+
+namespace AccountService.Application.Abstractions;
+
+public interface IInterestAccrualService
 {
-    public interface IInterestAccrualService
-    {
-        public Task AccrueInterestForAllDeposits();
-    }
+    [UsedImplicitly]
+    public Task AccrueInterestForAllDeposits();
 }

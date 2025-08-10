@@ -22,7 +22,7 @@ public class GetAccountStatementHandler(
         var isStartNull = request.Start == null;
         var isEndNull = request.End == null;
 
-        Expression<Func<Transaction, bool>> predicate = (t) =>  (t.AccountId == request.Id || t.CounterpartyAccountId == request.Id) &&
+        Expression<Func<Transaction, bool>> predicate = t =>  (t.AccountId == request.Id || t.CounterpartyAccountId == request.Id) &&
                                                                 (isStartNull || t.TransferTime >= request.Start) &&
                                                                 (isEndNull || t.TransferTime <= request.End);
 

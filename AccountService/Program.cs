@@ -27,7 +27,7 @@ public class Program
 
         var app = builder.Build();
 
-        app.MigrateDB();
+        app.MigrateDb();
     
         app.UseCors("cors");
 

@@ -12,7 +12,7 @@ public class GetAccountByIdHandler(AppDbContext dbContext, IMapper mapper)
 {
     public async Task<AccountDto> Handle(GetAccountByIdQuery request, CancellationToken cancellationToken)
     {
-        var account = await dbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(a => a.Id == request.Id);
+        var account = await dbContext.Accounts.AsNoTracking().FirstOrDefaultAsync(a => a.Id == request.Id, cancellationToken: cancellationToken);
         if (account == null)
             throw new ServiceException("Account Not Found", $"Account with id {request.Id} not found", StatusCodes.Status404NotFound);
 
