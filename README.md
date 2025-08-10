@@ -1,5 +1,5 @@
 
-# 🛡️ AccountService — ASP.NET Core API + Keycloak Auth
+# 🛡️ AccountService — ASP.NET Core API + Keycloak Auth + Postgresql
 
 Этот проект представляет собой REST API, разработанный на ASP.NET Core, с интеграцией авторизации через **Keycloak**. Контейнеризация выполнена с помощью `Docker` и `docker-compose`, для удобного запуска в разработке и отладке.
 
@@ -9,6 +9,7 @@
 
 - `AccountService` — ASP.NET Core Web API
 - `Keycloak` — система аутентификации и управления пользователями (SSO)
+- `Postgresql` - база данных
 - `docker-compose.yml` — объединяет все сервисы в единое окружение
 
 ---
@@ -36,12 +37,15 @@ docker-compose up --build
 
 После запуска:
 
-- 🌐 API будет доступен по адресу: [http://localhost:5080/swagger](http://localhost:5080/swagger)
+- 🌐 API будет доступен по адресу: [http://localhost:80/swagger](http://localhost:80/swagger)
 
 - 🔐 Keycloak: [http://localhost:8080](http://localhost:8080)  
   **Данные для входа по умолчанию:**
   - Логин: `admin`  
-  - Пароль: `admin`  
+  - Пароль: `admin`
+- 🗄️ Postgresql: [http://localhost:5432](http://localhost:5432)
+  - User: `postgres`
+  - Пароль: `1234` 
 
 Keycloak
 ---
