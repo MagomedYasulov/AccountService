@@ -31,7 +31,7 @@ services:
             context: .
             dockerfile: AccountService/Dockerfile
         ports:
-            - "5080:80"
+            - "80:80"
         networks:
             - services-network
         depends_on:
