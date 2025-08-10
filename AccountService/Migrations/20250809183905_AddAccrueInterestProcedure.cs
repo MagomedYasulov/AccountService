@@ -67,7 +67,8 @@ BEGIN
         ""CurrencyCode"",
         ""Type"",
         ""Description"",
-        ""TransferTime""
+        ""TransferTime"",
+        ""CreatedAt""
     )
     VALUES (
         gen_random_uuid(),
@@ -77,6 +78,7 @@ BEGIN
         acc_record.""CurrencyCode"",
         c_credit_tx_type_const,
         'accrual of interest on a deposit',
+        now(),
         now()
     );
 
