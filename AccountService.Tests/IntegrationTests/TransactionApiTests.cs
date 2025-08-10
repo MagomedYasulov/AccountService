@@ -126,19 +126,20 @@ namespace AccountService.Tests.IntegrationTests
             var json1 = JsonConvert.SerializeObject(debitTransactionAccount1);
             var json2 = JsonConvert.SerializeObject(debitTransactionAccount2);
 
-            var httpContent1 = new StringContent(json1, Encoding.UTF8, "application/json");
-            var htppContent2 = new StringContent(json2, Encoding.UTF8, "application/json");
 
             var client = _factory.CreateClient();
 
             // Act
-            var tasks = new Task[50];
+            var tasks = new Task<HttpResponseMessage>[50];
+            StringContent? httpContent = null;
             for(int i = 0; i < 50; i++)
             {
                 if(i % 2 == 0)
-                    tasks[i] = client.PostAsync("/api/v1/transactions", httpContent1);
+                    httpContent = new StringContent(json1, Encoding.UTF8, "application/json");
                 else
-                    tasks[i] = client.PostAsync("/api/v1/transactions", htppContent2);
+                    httpContent = new StringContent(json2, Encoding.UTF8, "application/json");
+
+                tasks[i] = client.PostAsync("/api/v1/transactions", httpContent);
             }
 
             await Task.WhenAll(tasks);

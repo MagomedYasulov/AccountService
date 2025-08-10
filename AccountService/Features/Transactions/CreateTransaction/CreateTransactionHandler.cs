@@ -64,6 +64,11 @@ public class CreateTransactionHandler(
             await dbTransaction.RollbackAsync(cancellationToken);
             throw new ServiceException("Concurrency Exception", "Account was modified by another transaction", StatusCodes.Status409Conflict);
         }
+        catch(InvalidOperationException)
+        {
+            await dbTransaction.RollbackAsync(cancellationToken);
+            throw new ServiceException("Concurrency Exception", "Account was modified by another transaction", StatusCodes.Status409Conflict);
+        }
         catch (Exception)
         {
             await dbTransaction.RollbackAsync(cancellationToken);
