@@ -8,6 +8,7 @@ using AccountService.Middlewares;
 using FluentValidation;
 using Hangfire;
 using Hangfire.PostgreSql;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using RabbitMQ.Client;
 
 namespace AccountService.Extensions;
 
@@ -203,6 +205,64 @@ public static class WebApplicationBuilderExtensions
 
 
         builder.Services.AddHangfireServer();
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddRabbitMQ(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddMassTransit(x =>
+        {
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host("rabbitmq", "/", h =>
+                {
+                    h.Username("guest");
+                    h.Password("guest");
+                });
+
+                // Создаём очередь и настраиваем параметры
+                cfg.ReceiveEndpoint("account.crm", e =>
+                {
+                    e.Durable = true;
+                    e.Bind("account.events", x =>
+                    {
+                        x.ExchangeType = ExchangeType.Topic;
+                        x.RoutingKey = "account.*";
+                    });
+                });
+
+                cfg.ReceiveEndpoint("account.notifications", e =>
+                {
+                    e.Durable = true;
+                    e.Bind("account.events", x =>
+                    {
+                        x.ExchangeType = ExchangeType.Topic;
+                        x.RoutingKey = "money.*";
+                    });
+                });
+
+                cfg.ReceiveEndpoint("account.antifraud", e =>
+                {
+                    e.Durable = true;
+                    e.Bind("account.events", x =>
+                    {
+                        x.ExchangeType = ExchangeType.Topic;
+                        x.RoutingKey = "client.*";
+                    });
+                });
+
+                cfg.ReceiveEndpoint("account.audit", e =>
+                {
+                    e.Durable = true;
+                    e.Bind("account.events", x =>
+                    {
+                        x.ExchangeType = ExchangeType.Topic;
+                        x.RoutingKey = "#";
+                    });
+                });
+            });
+        });
+
         return builder;
     }
 }
