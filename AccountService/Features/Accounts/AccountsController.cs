@@ -102,7 +102,7 @@ public class AccountsController(IMediator mediator) : ControllerBase
     /// <param name="isSoft">Полное / мягкое удаление</param>
     /// <returns></returns>
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(typeof(MbResult<AccountDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MbError), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(Guid id, [FromQuery] bool isSoft)
     {

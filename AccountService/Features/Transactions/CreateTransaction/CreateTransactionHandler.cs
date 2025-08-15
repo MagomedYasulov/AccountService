@@ -1,16 +1,18 @@
 ﻿using AccountService.Application.Abstractions;
 using AccountService.Domain.Data.Entities;
-using AccountService.Domain.Data.Repositories;
 using AccountService.Domain.Enums;
 using AccountService.Exceptions;
 using AccountService.Features.Transactions.Models;
+using AccountService.Infrastructure.Data;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace AccountService.Features.Transactions.CreateTransaction;
 
 public class CreateTransactionHandler(
-    IAccountRepository accountRepository,
+    AppDbContext dbContext,
     ICurrencyService currencyService,
     IMapper mapper)
     : IRequestHandler<CreateTransactionCommand, TransactionDto>
@@ -20,39 +22,58 @@ public class CreateTransactionHandler(
         if(!await currencyService.IsSupportedCurrency(request.CurrencyCode))
             throw new ServiceException("Not Supported Currency Type", $"Currency type {request.CurrencyCode} not supported", StatusCodes.Status409Conflict);
 
-        var account = await accountRepository.GetByIdAsync(request.AccountId);
+        var account = await dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == request.AccountId, cancellationToken: cancellationToken);
         AccountValidation(request.AccountId, account, request, TransactionType.Debit);
 
         Account? counterpartyAccount = null;
         if(request.CounterpartyAccountId != null)
         {
-            counterpartyAccount = await accountRepository.GetByIdAsync(request.CounterpartyAccountId.Value);
+            counterpartyAccount = await dbContext.Accounts.FirstOrDefaultAsync(a => a.Id == request.CounterpartyAccountId.Value, cancellationToken: cancellationToken);
             AccountValidation(request.CounterpartyAccountId.Value, counterpartyAccount, request, TransactionType.Credit);
         }
 
+        await using var dbTransaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
-        if (request.Type == TransactionType.Debit)
+        try
         {
-            account!.Balance -= request.Sum;
-            if(counterpartyAccount != null)
-                counterpartyAccount.Balance += request.Sum;
-        }             
-        else
-        {
-            account!.Balance += request.Sum;
-            if (counterpartyAccount != null)
-                counterpartyAccount.Balance -= request.Sum;
+            if (request.Type == TransactionType.Debit)
+            {
+                account!.Balance -= request.Sum;
+                if (counterpartyAccount != null)
+                    counterpartyAccount.Balance += request.Sum;
+            }
+            else
+            {
+                account!.Balance += request.Sum;
+                if (counterpartyAccount != null)
+                    counterpartyAccount.Balance -= request.Sum;
+            }
+
+            var transaction = mapper.Map<Transaction>(request);
+            transaction.TransferTime = DateTime.UtcNow;
+
+            await dbContext.Transactions.AddAsync(transaction, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            await dbTransaction.CommitAsync(cancellationToken);
+
+            return mapper.Map<TransactionDto>(transaction);
         }
-
-        var transaction = mapper.Map<Transaction>(request);
-        transaction.TransferTime = DateTime.UtcNow;
-
-        await accountRepository.CreateTransactionAsync(transaction);
-        await accountRepository.UpdateAsync(account);
-        if(counterpartyAccount != null)
-            await accountRepository.UpdateAsync(counterpartyAccount);
-
-        return mapper.Map<TransactionDto>(transaction);
+        catch (DbUpdateConcurrencyException)
+        {
+            await dbTransaction.RollbackAsync(cancellationToken);
+            throw new ServiceException("Concurrency Exception", "Account was modified by another transaction", StatusCodes.Status409Conflict);
+        }
+        catch(InvalidOperationException)
+        {
+            await dbTransaction.RollbackAsync(cancellationToken);
+            throw new ServiceException("Concurrency Exception", "Account was modified by another transaction", StatusCodes.Status409Conflict);
+        }
+        catch (Exception)
+        {
+            await dbTransaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 
     private static void AccountValidation(Guid accountId, Account? account, CreateTransactionCommand request, TransactionType operationType)

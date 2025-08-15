@@ -25,4 +25,6 @@ public class CreateAccountCommand : IRequest<AccountDto>
     /// Процентная ставка счета
     /// </summary>
     public decimal? InterestRate { get; set; }
+
+    public DateTime? ClosedAt { get; set; }
 }

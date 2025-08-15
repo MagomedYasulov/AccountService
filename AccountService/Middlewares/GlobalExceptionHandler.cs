@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using AccountService.Domain.Models;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         };
         problemDetails.Extensions.Add("traceId", Activity.Current?.Id ?? httpContext.TraceIdentifier);
 
-        var response = JsonConvert.SerializeObject(problemDetails, serializeSettings);
+        var response = JsonConvert.SerializeObject(new MbError(problemDetails), serializeSettings);
 
         httpContext.Response.ContentType = "application/problem+json";
         await httpContext.Response.WriteAsync(response, cancellationToken);

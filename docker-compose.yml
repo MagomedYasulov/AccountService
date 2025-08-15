@@ -12,17 +12,35 @@ services:
           - ./realms:/opt/keycloak/data/import
         command: ["start-dev", "--import-realm"]
 
+    postgres-db:
+        container_name: postgres
+        image: postgres:latest
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: 1234
+            POSTGRES_DB: AccountServiceDB
+        ports:
+           - 5432:5432
+        networks:
+            - services-network
+        volumes:
+            - postgres_data:/var/lib/postgresql/data 
+
     account-service:
         build:
             context: .
             dockerfile: AccountService/Dockerfile
         ports:
-            - "5080:80"
+            - "80:80"
         networks:
             - services-network
         depends_on:
             - keycloak-service
+            - postgres-db
   
 networks:
     services-network:    
         driver: bridge
+
+volumes:
+    postgres_data:

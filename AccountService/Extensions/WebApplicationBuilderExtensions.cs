@@ -1,14 +1,16 @@
 ﻿using AccountService.Application.Abstractions;
 using AccountService.Application.PipelineBehaviors;
-using AccountService.Domain.Data.Repositories;
 using AccountService.Features.Accounts.Models;
 using AccountService.Features.Transactions.Models;
-using AccountService.Infrastructure.Data.Repositories;
+using AccountService.Infrastructure.Data;
 using AccountService.Infrastructure.Services;
 using AccountService.Middlewares;
 using FluentValidation;
+using Hangfire;
+using Hangfire.PostgreSql;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -20,7 +22,7 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder AddData(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<IAccountRepository, AccountRepository>();
+        builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
         return builder;
     }
 
@@ -147,6 +149,7 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
         builder.Services.AddSingleton<IClientService, ClientService>();
+        builder.Services.AddScoped<IInterestAccrualService, InterestAccrualService>();
         return builder;
     }
 
@@ -185,6 +188,21 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddAuthorization(this WebApplicationBuilder builder)
     {
         builder.Services.AddAuthorization();
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddHangfire(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddHangfire(config =>  config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(opt => {
+                    opt.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"));
+                }));
+
+
+        builder.Services.AddHangfireServer();
         return builder;
     }
 }

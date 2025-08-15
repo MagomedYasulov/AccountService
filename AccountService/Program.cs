@@ -1,5 +1,7 @@
 
 using AccountService.Extensions;
+using AccountService.Infrastructure.Services;
+using Hangfire;
 
 namespace AccountService;
 
@@ -21,9 +23,12 @@ public class Program
         builder.AddCors();
         builder.AddAuthentication();
         builder.AddAuthorization();
+        builder.AddHangfire();
 
         var app = builder.Build();
 
+        app.MigrateDb();
+    
         app.UseCors("cors");
 
         // Configure the HTTP request pipeline.
@@ -31,7 +36,20 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+           
         }
+
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        {
+            Authorization = []
+        });
+
+        RecurringJob.AddOrUpdate<InterestAccrualService>(
+           "accrue-interest-daily",
+           service => service.AccrueInterestForAllDeposits(),
+           Cron.Daily(0, 0)
+        );
+
 
         app.UseRouting();
 
