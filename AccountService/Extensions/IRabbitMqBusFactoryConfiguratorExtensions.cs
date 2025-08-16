@@ -31,7 +31,6 @@ namespace AccountService.Extensions
 
             cfg.ReceiveEndpoint("account.antifraud", e =>
             {
-                e.ConfigureConsumer<AntifraudConsumer>(context);
 
                 e.Durable = true;
                 e.Bind("account.events", x =>
@@ -39,6 +38,8 @@ namespace AccountService.Extensions
                     x.ExchangeType = ExchangeType.Topic;
                     x.RoutingKey = "client.#";
                 });
+
+                e.ConfigureConsumer<AntifraudConsumer>(context);
             });
 
             cfg.ReceiveEndpoint("account.audit", e =>

@@ -1,6 +1,5 @@
-
+using AccountService.Application.Abstractions;
 using AccountService.Extensions;
-using AccountService.Infrastructure.Services;
 using Hangfire;
 
 namespace AccountService;
@@ -45,12 +44,7 @@ public class Program
             Authorization = []
         });
 
-        RecurringJob.AddOrUpdate<InterestAccrualService>(
-           "accrue-interest-daily",
-           service => service.AccrueInterestForAllDeposits(),
-           Cron.Daily(0, 0)
-        );
-
+        AddHangfireJobs();
 
         app.UseRouting();
 
@@ -61,5 +55,21 @@ public class Program
         app.MapControllers();
 
         app.Run();
+    }
+
+
+    private static void AddHangfireJobs()
+    {
+        RecurringJob.AddOrUpdate<IInterestAccrualService>(
+          "accrue-interest-daily",
+          service => service.AccrueInterestForAllDeposits(),
+          Cron.Daily(0, 0)
+       );
+
+        RecurringJob.AddOrUpdate<IOutboxDispatcher>(
+            "events-dispatch",
+            service => service.Dispatch(),
+            "*/10 * * * * *"
+        );
     }
 }

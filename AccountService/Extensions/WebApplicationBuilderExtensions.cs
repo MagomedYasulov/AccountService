@@ -4,6 +4,7 @@ using AccountService.Domain.Events;
 using AccountService.Features.Accounts.Models;
 using AccountService.Features.Transactions.Models;
 using AccountService.Infrastructure.Data;
+using AccountService.Infrastructure.RabbitMQ.Consumers;
 using AccountService.Infrastructure.Services;
 using AccountService.Middlewares;
 using FluentValidation;
@@ -153,6 +154,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
         builder.Services.AddSingleton<IClientService, ClientService>();
         builder.Services.AddScoped<IInterestAccrualService, InterestAccrualService>();
+        builder.Services.AddScoped<IOutboxDispatcher, OutboxDispatcher>();
         return builder;
     }
 
@@ -213,6 +215,8 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services.AddMassTransit(x =>
         {
+            x.AddConsumer<AntifraudConsumer>();
+
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
@@ -221,8 +225,8 @@ public static class WebApplicationBuilderExtensions
                     h.Password(builder.Configuration["RabbitMQ:Password"]!);
                 });
 
-                cfg.ConfigureMessages();
                 cfg.ConfigureEndpoints(context);
+                cfg.ConfigureMessages();
             });
         });
 
