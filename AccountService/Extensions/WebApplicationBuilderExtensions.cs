@@ -1,5 +1,6 @@
 ﻿using AccountService.Application.Abstractions;
 using AccountService.Application.PipelineBehaviors;
+using AccountService.Domain.Events;
 using AccountService.Features.Accounts.Models;
 using AccountService.Features.Transactions.Models;
 using AccountService.Infrastructure.Data;
@@ -214,52 +215,14 @@ public static class WebApplicationBuilderExtensions
         {
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host("rabbitmq", "/", h =>
+                cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
                 {
-                    h.Username("guest");
-                    h.Password("guest");
+                    h.Username(builder.Configuration["RabbitMQ:Username"]!);
+                    h.Password(builder.Configuration["RabbitMQ:Password"]!);
                 });
 
-                // Создаём очередь и настраиваем параметры
-                cfg.ReceiveEndpoint("account.crm", e =>
-                {
-                    e.Durable = true;
-                    e.Bind("account.events", x =>
-                    {
-                        x.ExchangeType = ExchangeType.Topic;
-                        x.RoutingKey = "account.*";
-                    });
-                });
-
-                cfg.ReceiveEndpoint("account.notifications", e =>
-                {
-                    e.Durable = true;
-                    e.Bind("account.events", x =>
-                    {
-                        x.ExchangeType = ExchangeType.Topic;
-                        x.RoutingKey = "money.*";
-                    });
-                });
-
-                cfg.ReceiveEndpoint("account.antifraud", e =>
-                {
-                    e.Durable = true;
-                    e.Bind("account.events", x =>
-                    {
-                        x.ExchangeType = ExchangeType.Topic;
-                        x.RoutingKey = "client.*";
-                    });
-                });
-
-                cfg.ReceiveEndpoint("account.audit", e =>
-                {
-                    e.Durable = true;
-                    e.Bind("account.events", x =>
-                    {
-                        x.ExchangeType = ExchangeType.Topic;
-                        x.RoutingKey = "#";
-                    });
-                });
+                cfg.ConfigureMessages();
+                cfg.ConfigureEndpoints(context);
             });
         });
 

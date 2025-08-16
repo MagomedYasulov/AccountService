@@ -24,6 +24,7 @@ public class Program
         builder.AddAuthentication();
         builder.AddAuthorization();
         builder.AddHangfire();
+        builder.AddRabbitMQ();
 
         var app = builder.Build();
 

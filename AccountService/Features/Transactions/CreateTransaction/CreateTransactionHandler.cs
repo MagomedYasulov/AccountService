@@ -84,10 +84,15 @@ public class CreateTransactionHandler(
         if (account.Revoked)
             throw new ServiceException("Account Revoked", $"Account with id {accountId} is revoked", StatusCodes.Status404NotFound);
 
+        var isDebit = request.Type == operationType;
+
+        if (isDebit && account.Frozen)
+            throw new ServiceException("Account Frozen", $"Accoutn with id {accountId} is frozen", StatusCodes.Status409Conflict);
+
         if (request.CurrencyCode != account.CurrencyCode)
             throw new ServiceException("Currency doesn't match", $"The currency of the account {accountId} and the transaction do not match", StatusCodes.Status409Conflict);
 
-        if (request.Type == operationType && account.Balance < request.Sum)
+        if (isDebit && account.Balance < request.Sum)
             throw new ServiceException("Insufficient funds", "Insufficient funds for the operation", StatusCodes.Status409Conflict);
     }
 }

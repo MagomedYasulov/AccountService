@@ -25,6 +25,8 @@ public class Account : BaseEntity
     /// </summary>
     public bool Revoked { get; set; }
 
+    public bool Frozen { get; set; }
+
     /// <summary>
     /// Оптимистичная блокировка через concurrency‑token
     /// </summary>
