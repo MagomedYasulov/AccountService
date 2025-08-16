@@ -31,14 +31,13 @@ namespace AccountService.Extensions
 
             cfg.ReceiveEndpoint("account.antifraud", e =>
             {
-                e.ConfigureConsumer<ClientBlockedConsumer>(context);
-                e.ConfigureConsumer<ClientUnblockedConsumer>(context);
+                e.ConfigureConsumer<AntifraudConsumer>(context);
 
                 e.Durable = true;
                 e.Bind("account.events", x =>
                 {
                     x.ExchangeType = ExchangeType.Topic;
-                    x.RoutingKey = "client.*";
+                    x.RoutingKey = "client.#";
                 });
             });
 
