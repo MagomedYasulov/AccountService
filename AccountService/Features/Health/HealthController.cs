@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AccountService.Features.Health
 {
-    [Route("api/v1/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     [TypeFilter<ApiExceptionFilter>]
     public class HealthController : ControllerBase
