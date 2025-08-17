@@ -93,7 +93,7 @@ public class CreateTransactionHandler(
         var isDebit = request.Type == operationType;
 
         if (isDebit && account.Frozen)
-            throw new ServiceException("Account Frozen", $"Accoutn with id {accountId} is frozen", StatusCodes.Status409Conflict);
+            throw new ServiceException("Account Frozen", $"Account with id {accountId} is frozen", StatusCodes.Status409Conflict);
 
         if (request.CurrencyCode != account.CurrencyCode)
             throw new ServiceException("Currency doesn't match", $"The currency of the account {accountId} and the transaction do not match", StatusCodes.Status409Conflict);
@@ -106,6 +106,7 @@ public class CreateTransactionHandler(
     {
         string eventType;
         string json;
+        string routingKey;
 
         if (request.CounterpartyAccountId == null)
         {
@@ -123,6 +124,7 @@ public class CreateTransactionHandler(
                 };
                 eventType = typeof(MoneyDebited).AssemblyQualifiedName!;
                 json = JsonConvert.SerializeObject(moneyCredited);
+                routingKey = "money.debited";
             }
             else
             {
@@ -137,6 +139,7 @@ public class CreateTransactionHandler(
                 };
                 eventType = typeof(MoneyCredited).AssemblyQualifiedName!;
                 json = JsonConvert.SerializeObject(moneyCredited);
+                routingKey = "money.credited";
             }
         }
         else
@@ -153,8 +156,9 @@ public class CreateTransactionHandler(
             };
             eventType = typeof(TransferCompleted).AssemblyQualifiedName!;
             json = JsonConvert.SerializeObject(transferCompleted);
+            routingKey = "money.transfer.completed";
         }
 
-        return new OutboxMessage() { Payload = json, EventType = eventType, OccurredAt = DateTime.UtcNow, RoutingKey = "money.*" };
+        return new OutboxMessage() { Payload = json, EventType = eventType, OccurredAt = DateTime.UtcNow, RoutingKey = routingKey };
     }
 }

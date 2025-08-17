@@ -58,7 +58,7 @@ public class CreateAccountHandler(
             {
                 Payload = json,
                 EventType = typeof(AccountOpened).AssemblyQualifiedName!,
-                RoutingKey = "account.*",
+                RoutingKey = "account.opened",
                 OccurredAt = DateTime.UtcNow,     
             };
 

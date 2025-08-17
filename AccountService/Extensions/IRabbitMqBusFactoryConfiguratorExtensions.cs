@@ -25,7 +25,7 @@ namespace AccountService.Extensions
                 e.Bind("account.events", x =>
                 {
                     x.ExchangeType = ExchangeType.Topic;
-                    x.RoutingKey = "money.*";
+                    x.RoutingKey = "money.#";
                 });
             });
 
