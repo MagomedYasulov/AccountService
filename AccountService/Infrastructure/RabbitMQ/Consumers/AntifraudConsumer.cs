@@ -4,59 +4,51 @@ using AccountService.Infrastructure.Data;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
-namespace AccountService.Infrastructure.RabbitMQ.Consumers
+namespace AccountService.Infrastructure.RabbitMQ.Consumers;
+
+public class AntifraudConsumer(AppDbContext dbContext) : IConsumer<ClientBlocked>, IConsumer<ClientUnblocked>
 {
-    public class AntifraudConsumer : IConsumer<ClientBlocked>, IConsumer<ClientUnblocked>
+    public async Task Consume(ConsumeContext<ClientBlocked> context)
     {
-        private readonly AppDbContext _dbContext;
+        if (await dbContext.InboxConsumeds.AnyAsync(ic => ic.MessageId == context.MessageId))
+            return;
 
-        public AntifraudConsumer(AppDbContext dbContext)
+        var accounts = await dbContext.Accounts.Where(a => a.OwnerId == context.Message.ClientId).ToArrayAsync();
+        foreach (var account in accounts)
         {
-            _dbContext = dbContext;
+            account.Frozen = true;
         }
 
-        public async Task Consume(ConsumeContext<ClientBlocked> context)
+        var consumed = new InboxConsumed
         {
-            if (await _dbContext.InboxConsumeds.AnyAsync(ic => ic.MessageId == context.MessageId))
-                return;
+            MessageId = context.MessageId!.Value,
+            ProcessedAt = DateTime.UtcNow,
+            Handler = nameof(AntifraudConsumer)
+        };
+        await dbContext.InboxConsumeds.AddAsync(consumed);
 
-            var accounts = await _dbContext.Accounts.Where(a => a.OwnerId == context.Message.ClientId).ToArrayAsync();
-            foreach (var account in accounts)
-            {
-                account.Frozen = true;
-            }
+        await dbContext.SaveChangesAsync();
+    }
 
-            var consumed = new InboxConsumed()
-            {
-                MessageId = context.MessageId!.Value,
-                ProcessedAt = DateTime.UtcNow,
-                Handler = nameof(AntifraudConsumer)
-            };
-            await _dbContext.InboxConsumeds.AddAsync(consumed);
+    public async Task Consume(ConsumeContext<ClientUnblocked> context)
+    {
+        if (await dbContext.InboxConsumeds.AnyAsync(ic => ic.MessageId == context.MessageId))
+            return;
 
-            await _dbContext.SaveChangesAsync();
+        var accounts = await dbContext.Accounts.Where(a => a.OwnerId == context.Message.ClientId).ToArrayAsync();
+        foreach (var account in accounts)
+        {
+            account.Frozen = false;
         }
 
-        public async Task Consume(ConsumeContext<ClientUnblocked> context)
+        var consumed = new InboxConsumed
         {
-            if (await _dbContext.InboxConsumeds.AnyAsync(ic => ic.MessageId == context.MessageId))
-                return;
+            MessageId = context.MessageId!.Value,
+            ProcessedAt = DateTime.UtcNow,
+            Handler = nameof(AntifraudConsumer)
+        };
+        await dbContext.InboxConsumeds.AddAsync(consumed);
 
-            var accounts = await _dbContext.Accounts.Where(a => a.OwnerId == context.Message.ClientId).ToArrayAsync();
-            foreach (var account in accounts)
-            {
-                account.Frozen = false;
-            }
-
-            var consumed = new InboxConsumed()
-            {
-                MessageId = context.MessageId!.Value,
-                ProcessedAt = DateTime.UtcNow,
-                Handler = nameof(AntifraudConsumer)
-            };
-            await _dbContext.InboxConsumeds.AddAsync(consumed);
-
-            await _dbContext.SaveChangesAsync();
-        }
+        await dbContext.SaveChangesAsync();
     }
 }

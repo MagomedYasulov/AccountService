@@ -1,10 +1,5 @@
-﻿using AccountService.Features.Accounts.Models;
-using MediatR;
+﻿using MediatR;
 
-namespace AccountService.Features.Health.GetReady
-{
-    public class CheckReadyQuery : IRequest
-    {
+namespace AccountService.Features.Health.GetReady;
 
-    }
-}
+public class CheckReadyQuery : IRequest;

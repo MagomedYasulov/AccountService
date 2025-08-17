@@ -4,34 +4,26 @@ using AccountService.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AccountService.Features.Health
+namespace AccountService.Features.Health;
+
+[Route("[controller]")]
+[ApiController]
+[TypeFilter<ApiExceptionFilter>]
+public class HealthController(IMediator mediator) : ControllerBase
 {
-    [Route("[controller]")]
-    [ApiController]
-    [TypeFilter<ApiExceptionFilter>]
-    public class HealthController : ControllerBase
+    [HttpGet("live")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult Live()
     {
-        private readonly IMediator _mediator;
+        return Ok();
+    }
 
-        public HealthController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        [HttpGet("live")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult Live()
-        {
-            return Ok();
-        }
-
-        [HttpGet("ready")]
-        [ProducesResponseType(typeof(MbError), StatusCodes.Status503ServiceUnavailable)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult Ready()
-        {
-            _mediator.Send(new CheckReadyQuery());
-            return Ok();
-        }
+    [HttpGet("ready")]
+    [ProducesResponseType(typeof(MbError), StatusCodes.Status503ServiceUnavailable)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult Ready()
+    {
+        mediator.Send(new CheckReadyQuery());
+        return Ok();
     }
 }

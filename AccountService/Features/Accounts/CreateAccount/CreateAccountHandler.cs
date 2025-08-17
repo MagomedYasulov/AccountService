@@ -43,7 +43,7 @@ public class CreateAccountHandler(
             await dbContext.Accounts.AddAsync(account, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            var accountOpened = new AccountOpened()
+            var accountOpened = new AccountOpened
             {
                 AccountId = account.Id,
                 Currency = account.CurrencyCode,
@@ -54,12 +54,12 @@ public class CreateAccountHandler(
             };
             var json = JsonConvert.SerializeObject(accountOpened);
 
-            var outboxMessage = new OutboxMessage()
+            var outboxMessage = new OutboxMessage
             {
                 Payload = json,
                 EventType = typeof(AccountOpened).AssemblyQualifiedName!,
                 RoutingKey = "account.opened",
-                OccurredAt = DateTime.UtcNow,     
+                OccurredAt = DateTime.UtcNow
             };
 
             await dbContext.OutboxMessages.AddAsync(outboxMessage, cancellationToken);

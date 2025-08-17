@@ -1,6 +1,5 @@
 ﻿using AccountService.Application.Abstractions;
 using AccountService.Application.PipelineBehaviors;
-using AccountService.Domain.Events;
 using AccountService.Features.Accounts.Models;
 using AccountService.Features.Transactions.Models;
 using AccountService.Infrastructure.Data;
@@ -18,7 +17,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using RabbitMQ.Client;
 
 namespace AccountService.Extensions;
 
@@ -211,7 +209,7 @@ public static class WebApplicationBuilderExtensions
         return builder;
     }
 
-    public static WebApplicationBuilder AddRabbitMQ(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddRabbitMq(this WebApplicationBuilder builder)
     {
         builder.Services.AddMassTransit(x =>
         {

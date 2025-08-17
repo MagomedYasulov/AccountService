@@ -7,6 +7,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
+    // ReSharper disable once IdentifierTypo
     public DbSet<InboxConsumed> InboxConsumeds => Set<InboxConsumed>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 

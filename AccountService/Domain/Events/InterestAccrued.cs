@@ -1,13 +1,24 @@
-﻿namespace AccountService.Domain.Events
-{
-    public class InterestAccrued
-    {
-        public Guid EventId { get; set; }
-        public DateTime OccurredAt { get; set; }
-        public Guid AccountId { get; set; }
+﻿using JetBrains.Annotations;
 
-        public DateTime PeriodFrom { get; set; }
-        public DateTime PeriodTo { get; set; }
-        public decimal Amount { get; set; }
-    }
+namespace AccountService.Domain.Events;
+
+public class InterestAccrued
+{
+    [UsedImplicitly]
+    public Guid EventId { get; set; }
+
+    [UsedImplicitly]
+    public DateTime OccurredAt { get; set; }
+
+    [UsedImplicitly]
+    public Guid AccountId { get; set; }
+
+    [UsedImplicitly]
+    public DateTime PeriodFrom { get; set; }
+
+    [UsedImplicitly]
+    public DateTime PeriodTo { get; set; }
+
+    [UsedImplicitly]
+    public decimal Amount { get; set; }
 }

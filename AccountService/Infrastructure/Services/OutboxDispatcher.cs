@@ -4,36 +4,26 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
-namespace AccountService.Infrastructure.Services
+namespace AccountService.Infrastructure.Services;
+
+public class OutboxDispatcher(
+    IPublishEndpoint publishEndpoint,
+    AppDbContext dbContext)
+    : IOutboxDispatcher
 {
-    public class OutboxDispatcher : IOutboxDispatcher
+    public async Task Dispatch()
     {
-        private readonly IPublishEndpoint _publishEndpoint;
-        private readonly AppDbContext _dbContext;
+        var messages = await dbContext.OutboxMessages.Where(x => !x.Sent).ToArrayAsync();
 
-        public OutboxDispatcher(
-            IPublishEndpoint publishEndpoint,
-            AppDbContext dbContext)
+        foreach (var message in messages)
         {
-            _publishEndpoint = publishEndpoint;
-            _dbContext = dbContext;
-        }
-
-        public async Task Dispatch()
-        {
-            var messages = await _dbContext.OutboxMessages.Where(x => !x.Sent).ToArrayAsync();
-
-            foreach (var message in messages)
-            {
-                var type = Type.GetType(message.EventType);
-                var @event = JsonConvert.DeserializeObject(message.Payload, type!);
-                await _publishEndpoint.Publish(@event!, context => context.SetRoutingKey(message.RoutingKey), CancellationToken.None);
+            var type = Type.GetType(message.EventType);
+            var @event = JsonConvert.DeserializeObject(message.Payload, type!);
+            await publishEndpoint.Publish(@event!, context => context.SetRoutingKey(message.RoutingKey), CancellationToken.None);
      
-                message.Sent = true;
-            }
-
-            await _dbContext.SaveChangesAsync();
+            message.Sent = true;
         }
+
+        await dbContext.SaveChangesAsync();
     }
 }
-

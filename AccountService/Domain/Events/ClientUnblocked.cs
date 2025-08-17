@@ -1,9 +1,13 @@
-﻿namespace AccountService.Domain.Events
+﻿using JetBrains.Annotations;
+
+namespace AccountService.Domain.Events;
+
+public class ClientUnblocked
 {
-    public class ClientUnblocked
-    {
-        public Guid EventId { get; set; }
-        public DateTime OccurredAt { get; set; }
-        public Guid ClientId { get; set; }
-    }
+    [UsedImplicitly]
+    public Guid EventId { get; set; }
+
+    [UsedImplicitly]
+    public DateTime OccurredAt { get; set; }
+    public Guid ClientId { get; set; }
 }

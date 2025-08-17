@@ -1,7 +1,6 @@
-﻿namespace AccountService.Application.Abstractions
+﻿namespace AccountService.Application.Abstractions;
+
+public interface IOutboxDispatcher
 {
-    public interface IOutboxDispatcher
-    {
-        public Task Dispatch();
-    }
+    public Task Dispatch();
 }

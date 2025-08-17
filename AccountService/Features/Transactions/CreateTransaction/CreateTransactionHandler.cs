@@ -112,7 +112,7 @@ public class CreateTransactionHandler(
         {
             if (request.Type == TransactionType.Debit)
             {
-                var moneyCredited = new MoneyDebited()
+                var moneyCredited = new MoneyDebited
                 {
                     AccountId = request.AccountId,
                     Amount = request.Sum,
@@ -120,7 +120,7 @@ public class CreateTransactionHandler(
                     EventId = Guid.NewGuid(),
                     OccurredAt = DateTime.UtcNow,
                     OperationId = transactionId,
-                    Reason = request.Description,
+                    Reason = request.Description
                 };
                 eventType = typeof(MoneyDebited).AssemblyQualifiedName!;
                 json = JsonConvert.SerializeObject(moneyCredited);
@@ -128,14 +128,14 @@ public class CreateTransactionHandler(
             }
             else
             {
-                var moneyCredited = new MoneyCredited()
+                var moneyCredited = new MoneyCredited
                 {
                     AccountId = request.AccountId,
                     Amount = request.Sum,
                     Currency = request.CurrencyCode,
                     EventId = Guid.NewGuid(),
                     OccurredAt = DateTime.UtcNow,
-                    OperationId = transactionId,
+                    OperationId = transactionId
                 };
                 eventType = typeof(MoneyCredited).AssemblyQualifiedName!;
                 json = JsonConvert.SerializeObject(moneyCredited);
@@ -144,7 +144,7 @@ public class CreateTransactionHandler(
         }
         else
         {
-            var transferCompleted = new TransferCompleted()
+            var transferCompleted = new TransferCompleted
             {
                 Amount = request.Sum,
                 Currency = request.CurrencyCode,
@@ -159,6 +159,6 @@ public class CreateTransactionHandler(
             routingKey = "money.transfer.completed";
         }
 
-        return new OutboxMessage() { Payload = json, EventType = eventType, OccurredAt = DateTime.UtcNow, RoutingKey = routingKey };
+        return new OutboxMessage { Payload = json, EventType = eventType, OccurredAt = DateTime.UtcNow, RoutingKey = routingKey };
     }
 }
