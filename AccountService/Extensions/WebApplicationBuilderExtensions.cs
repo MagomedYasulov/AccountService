@@ -3,11 +3,13 @@ using AccountService.Application.PipelineBehaviors;
 using AccountService.Features.Accounts.Models;
 using AccountService.Features.Transactions.Models;
 using AccountService.Infrastructure.Data;
+using AccountService.Infrastructure.RabbitMQ.Consumers;
 using AccountService.Infrastructure.Services;
 using AccountService.Middlewares;
 using FluentValidation;
 using Hangfire;
 using Hangfire.PostgreSql;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -150,6 +152,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
         builder.Services.AddSingleton<IClientService, ClientService>();
         builder.Services.AddScoped<IInterestAccrualService, InterestAccrualService>();
+        builder.Services.AddScoped<IOutboxDispatcher, OutboxDispatcher>();
         return builder;
     }
 
@@ -203,6 +206,28 @@ public static class WebApplicationBuilderExtensions
 
 
         builder.Services.AddHangfireServer();
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddRabbitMq(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddMassTransit(x =>
+        {
+            x.AddConsumer<AntifraudConsumer>();
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h =>
+                {
+                    h.Username(builder.Configuration["RabbitMQ:Username"]!);
+                    h.Password(builder.Configuration["RabbitMQ:Password"]!);
+                });
+
+                cfg.ConfigureEndpoints(context);
+                cfg.ConfigureMessages();
+            });
+        });
+
         return builder;
     }
 }

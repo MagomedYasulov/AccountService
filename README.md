@@ -1,5 +1,5 @@
 
-# 🛡️ AccountService — ASP.NET Core API + Keycloak Auth + Postgresql
+# 🛡️ AccountService
 
 Этот проект представляет собой REST API, разработанный на ASP.NET Core, с интеграцией авторизации через **Keycloak**. Контейнеризация выполнена с помощью `Docker` и `docker-compose`, для удобного запуска в разработке и отладке.
 
@@ -10,6 +10,7 @@
 - `AccountService` — ASP.NET Core Web API
 - `Keycloak` — система аутентификации и управления пользователями (SSO)
 - `Postgresql` - база данных
+- `RabbitMQ` - Брокер сообщений
 - `docker-compose.yml` — объединяет все сервисы в единое окружение
 
 ---
@@ -46,7 +47,10 @@ docker-compose up --build
   - Пароль: `admin`
 - 🗄️ Postgresql: [http://localhost:5432](http://localhost:5432)
   - User: `postgres`
-  - Пароль: `1234` 
+  - Пароль: `1234`
+- RabbitMQ [http://localhost:15672](http://localhost:15672)
+  - User: `guest`
+  - Password: `guest` 
 
 Keycloak
 ---
@@ -78,10 +82,3 @@ curl -X POST "http://localhost:8080/realms/bank-service/protocol/openid-connect/
   -d "username=user" \
   -d "password=1234"
 ```
-# DeliveryService.Backend
-#### API
-Документаця по API доступнапо адрессу http://localhost:5109/swagger/index.html
-#### Logging
-Логирование в файл и на консоль происходит с помощью NLog. Путь до лог файла можно найти и изменить в конфиге nlog.config
-#### Входные данные
-Проект содержит готовую SQLite DB DeliveryService.db с тестовыми данными.

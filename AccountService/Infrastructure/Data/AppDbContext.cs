@@ -7,10 +7,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
-
+    // ReSharper disable once IdentifierTypo
+    public DbSet<InboxConsumed> InboxConsumeds => Set<InboxConsumed>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<InboxConsumed>()
+            .HasKey(ic => ic.MessageId);
+            
         modelBuilder.Entity<Account>()
             .Property(e => e.xmin)
             // ReSharper disable once StringLiteralTypo
